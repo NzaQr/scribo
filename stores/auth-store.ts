@@ -2,7 +2,6 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { useRouter } from "next/navigation";
 import { authApi } from "@/lib/api";
 
 interface User {
@@ -46,7 +45,6 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         const currentToken = get().token;
-        const router = useRouter();
 
         if (currentToken && typeof window !== "undefined") {
           import("@/lib/api").then(({ authApi }) => {
@@ -63,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
         });
 
         if (typeof window !== "undefined") {
-          router.push("/auth/login");
+          window.location.href = "/auth/login";
         }
       },
 
