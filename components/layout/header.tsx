@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useAuthStore } from "@/stores/auth-store";
 
 export function Header() {
+  const { user, isAuthenticated, logout, isLoading } = useAuthStore();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto grid grid-cols-3 h-16 items-center px-4">
@@ -41,19 +44,39 @@ export function Header() {
         </nav>
 
         <div className="flex items-center justify-end space-x-2">
+          {isLoading ? (
+            <div className="h-8 w-20 bg-muted animate-pulse rounded" />
+          ) : isAuthenticated ? (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground">
+                Welcome, {user?.username}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                className="text-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
+              >
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Link href="/auth/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
+                >
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button size="sm">Register</Button>
+              </Link>
+            </>
+          )}
           <ThemeToggle />
-          <Link href="/auth/login">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
-            >
-              Sign In
-            </Button>
-          </Link>
-          <Link href="/auth/register">
-            <Button size="sm">Register</Button>
-          </Link>
         </div>
       </div>
     </header>

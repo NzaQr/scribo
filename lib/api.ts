@@ -1,4 +1,10 @@
-import axios from "axios";
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+
+let authStore: any = null;
+
+export const setAuthStoreReference = (store: any) => {
+  authStore = store;
+};
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -6,6 +12,62 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+const createAuthenticatedApi = () => {
+  const authenticatedApi = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  authenticatedApi.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+      const token = authStore?.getState?.()?.token;
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+  authenticatedApi.interceptors.response.use(
+    (response: AxiosResponse) => response,
+    async (error) => {
+      const originalRequest = error.config;
+
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        try {
+          const refreshToken = authStore?.getState?.()?.refreshToken;
+          if (!refreshToken) {
+            throw new Error("No refresh token available");
+          }
+
+          const newTokens = await authApi.refreshToken(refreshToken);
+
+          authStore
+            ?.getState?.()
+            ?.updateTokens?.(newTokens.token, newTokens.refreshToken);
+
+          originalRequest.headers.Authorization = `Bearer ${newTokens.token}`;
+          return authenticatedApi(originalRequest);
+        } catch (refreshError) {
+          authStore?.getState?.()?.logout?.();
+          return Promise.reject(refreshError);
+        }
+      }
+
+      return Promise.reject(error);
+    }
+  );
+
+  return authenticatedApi;
+};
+
+const authenticatedApi = createAuthenticatedApi();
 
 export interface BlogPost {
   id: string;
@@ -24,24 +86,58 @@ export interface BlogPost {
 }
 
 export const blogApi = {
-  getPosts: () => api.get<BlogPost[]>("/api/posts").then((res) => res.data),
+  getPosts: async (token?: string) => {
+    const client = token ? authenticatedApi : api;
+    const res = await client.get<BlogPost[]>("/api/posts");
+    return res.data;
+  },
 
-  getPost: (id: string) =>
-    api.get<BlogPost>(`/api/posts/${id}`).then((res) => res.data),
+  getPost: async (id: string, token?: string) => {
+    const client = token ? authenticatedApi : api;
+    const res = await client.get<BlogPost>(`/api/posts/${id}`);
+    return res.data;
+  },
 
-  createPost: (post: Omit<BlogPost, "id">) =>
-    api.post<BlogPost>("/api/posts", post).then((res) => res.data),
+  createPost: async (post: Omit<BlogPost, "id">) => {
+    const res = await authenticatedApi.post<BlogPost>("/api/posts", post);
+    return res.data;
+  },
 
-  updatePost: (id: string, post: Partial<BlogPost>) =>
-    api.put<BlogPost>(`/api/posts/${id}`, post).then((res) => res.data),
+  updatePost: async (id: string, post: Partial<BlogPost>) => {
+    const res = await authenticatedApi.put<BlogPost>(`/api/posts/${id}`, post);
+    return res.data;
+  },
 
-  deletePost: (id: string) => api.delete(`/api/posts/${id}`),
+  deletePost: (id: string) => {
+    return authenticatedApi.delete(`/api/posts/${id}`);
+  },
 };
 
 export const authApi = {
   login: (email: string, password: string) =>
     api.post("/api/auth/login", { email, password }).then((res) => res.data),
 
-  register: (userData: { email: string; password: string; name: string }) =>
+  register: (userData: { email: string; password: string; username: string }) =>
     api.post("/api/auth/register", userData).then((res) => res.data),
+
+  refreshToken: (refreshToken: string) =>
+    api.post("/api/auth/refresh", { refreshToken }).then((res) => res.data),
+
+  verifyToken: (token: string) =>
+    api
+      .get("/api/auth/verify", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => res.data),
+
+  logout: (token: string) =>
+    api
+      .post(
+        "/api/auth/logout",
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((res) => res.data),
 };

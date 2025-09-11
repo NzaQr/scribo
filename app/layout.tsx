@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-client";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/lib/authProvider";
 
 export const metadata: Metadata = {
   title: "Scribo",
@@ -17,15 +18,17 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning={true}>
       <body className="font-sans antialiased" suppressHydrationWarning={true}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-          enableColorScheme={false}
-        >
-          <QueryProvider>{children}</QueryProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+            enableColorScheme={false}
+          >
+            <QueryProvider>{children}</QueryProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
