@@ -39,17 +39,20 @@ export function BlogCard({ post, index }: BlogCardProps) {
               </span>
             ))}
           </div>
-          <CardTitle className="line-clamp-2">{post.title}</CardTitle>
-          <CardDescription className="line-clamp-3">
-            {post.description}
-          </CardDescription>
+          <CardTitle>{post.title}</CardTitle>
+          <CardDescription>{post.description}</CardDescription>
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col justify-between">
           <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-            <span>By {post.author.username}</span>
+            <Link
+              href={`/profile/${post.author._id}`}
+              className="hover:text-primary transition-colors"
+            >
+              By {post.author.username}
+            </Link>
             <span>
-              {new Date(post.createdAt).toLocaleDateString("es-ES", {
+              {new Date(post.createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -63,7 +66,7 @@ export function BlogCard({ post, index }: BlogCardProps) {
                 {readTime} min read
               </span>
             )}
-            <Link href={`/blog/${post.id}`}>
+            <Link href={`/blog/${post._id}`}>
               <Button
                 variant="ghost"
                 size="sm"

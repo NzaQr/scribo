@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/lib/query-client";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/lib/authProvider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Scribo",
@@ -27,6 +28,7 @@ export default function RootLayout({
             enableColorScheme={false}
           >
             <QueryProvider>{children}</QueryProvider>
+            <Toaster richColors position="top-right" />
           </ThemeProvider>
         </AuthProvider>
       </body>

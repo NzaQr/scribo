@@ -3,6 +3,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function AboutPage() {
   return (
@@ -65,7 +66,9 @@ export default function AboutPage() {
                 articles and join thousands of developers who trust Scribo for
                 quality content.
               </p>
-              <Button size="lg">Start Reading</Button>
+              <Link href="/blog">
+                <Button size="lg">Start Reading</Button>
+              </Link>
             </div>
           </div>
         </section>

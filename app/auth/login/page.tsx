@@ -13,11 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useLoginForm } from "@/hooks/use-login-form";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 export default function LoginPage() {
   const { formData, errors, isLoading, handleInputChange, handleSubmit } =
     useLoginForm();
-
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -47,7 +49,7 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="email"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-foreground"
                   >
                     Email
                   </label>
@@ -55,7 +57,6 @@ export default function LoginPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="your@email.com"
                     value={formData.email}
                     onChange={handleInputChange("email")}
                     className={
@@ -81,30 +82,42 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="password"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-foreground"
                   >
                     Password
                   </label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleInputChange("password")}
-                    className={
-                      errors.password
-                        ? "border-red-500 focus:border-red-500"
-                        : ""
-                    }
-                    aria-invalid={!!errors.password}
-                    aria-describedby={
-                      errors.password ? "password-error" : undefined
-                    }
-                    disabled={isLoading}
-                    autoComplete="current-password"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleInputChange("password")}
+                      className={
+                        errors.password
+                          ? "border-red-500 focus:border-red-500 pr-10"
+                          : "pr-10"
+                      }
+                      aria-invalid={!!errors.password}
+                      aria-describedby={
+                        errors.password ? "password-error" : undefined
+                      }
+                      disabled={isLoading}
+                      autoComplete="current-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground focus:outline-none"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </button>
+                  </div>
                   {errors.password && (
                     <p
                       id="password-error"

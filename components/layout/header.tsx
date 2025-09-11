@@ -4,6 +4,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useAuthStore } from "@/stores/auth-store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User, LogOut, FileText, Plus } from "lucide-react";
 
 export function Header() {
   const { user, isAuthenticated, logout, isLoading } = useAuthStore();
@@ -14,8 +22,11 @@ export function Header() {
         <div className="flex items-center justify-start">
           <div className="hover:scale-105 transition-transform duration-200">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-primary"></div>
-              <span className="text-xl font-bold text-foreground">S</span>
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                <span className="text-xl font-bold text-primary-foreground">
+                  S
+                </span>
+              </div>
             </Link>
           </div>
         </div>
@@ -48,17 +59,50 @@ export function Header() {
             <div className="h-8 w-20 bg-muted animate-pulse rounded" />
           ) : isAuthenticated ? (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground">
-                Welcome, {user?.username}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={logout}
-                className="text-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
-              >
-                Logout
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    {user?.username}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user?.username}</p>
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/profile/${user?.id}`}
+                      className="cursor-pointer"
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>My Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/blog/create">
+                      <Plus className="mr-2 h-4 w-4" />
+                      <span>Create Post</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <>
@@ -66,9 +110,9 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
+                  className="text-foreground hover:text-foreground hover:bg-primary/10 transition-colors min-w-[90px] px-4"
                 >
-                  Sign In
+                  Log In
                 </Button>
               </Link>
               <Link href="/auth/register">

@@ -31,11 +31,11 @@ export default function BlogPage() {
         <section className="py-16 px-4 bg-muted/30 flex justify-center">
           <div className="container mx-auto max-w-4xl text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 fade-in">
-              Our Blog
+              Articles
             </h1>
 
             <p className="text-xl text-muted-foreground mb-8 fade-in-delay-1">
-              Articles about web development, design and technology
+              Read all about software development, design and technology
             </p>
 
             <div className="max-w-md mx-auto flex gap-2 fade-in-delay-2">
@@ -65,7 +65,7 @@ export default function BlogPage() {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredPosts?.map((post, index) => (
-                    <BlogCard key={post.id} post={post} index={index} />
+                    <BlogCard key={post._id} post={post} index={index} />
                   ))}
                 </div>
 

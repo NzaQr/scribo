@@ -70,18 +70,17 @@ const createAuthenticatedApi = () => {
 const authenticatedApi = createAuthenticatedApi();
 
 export interface BlogPost {
-  id: string;
+  _id: string;
   title: string;
   description: string;
+  content: string;
   author: {
     _id: string;
     username: string;
     email: string;
   };
   createdAt: Date;
-  readTime: string;
   tags: string[];
-  content?: string;
   slug?: string;
 }
 
@@ -98,7 +97,7 @@ export const blogApi = {
     return res.data;
   },
 
-  createPost: async (post: Omit<BlogPost, "id">) => {
+  createPost: async (post: Omit<BlogPost, "_id">) => {
     const res = await authenticatedApi.post<BlogPost>("/api/posts", post);
     return res.data;
   },
@@ -110,6 +109,11 @@ export const blogApi = {
 
   deletePost: (id: string) => {
     return authenticatedApi.delete(`/api/posts/${id}`);
+  },
+
+  getUserPosts: async (userId: string) => {
+    const res = await api.get<BlogPost[]>(`/api/posts/user/${userId}`);
+    return res.data;
   },
 };
 

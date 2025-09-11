@@ -19,6 +19,8 @@
   --border: #e0e0e0;
   --input: #ffffff;
   --ring: rgba(255, 111, 97, 0.5);
+  --popover: #ffffff;
+  --popover-foreground: #343a40;
   --radius: 0.5rem;
 }
 
@@ -36,8 +38,10 @@
   --muted: #2d2d2d;
   --muted-foreground: #adb5bd;
   --border: #404040;
-  --input: #2d2d2d;
+  --input: #3a3a3a;
   --ring: rgba(255, 111, 97, 0.5);
+  --popover: #2d2d2d;
+  --popover-foreground: #f8f9fa;
 }
 
 @theme inline {
@@ -60,6 +64,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -135,5 +141,101 @@
 
   .animate-stagger-3 {
     animation: fade-in 0.6s ease-out 0.3s both;
+  }
+}
+
+@layer components {
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5em;
+    background: var(--muted);
+    color: var(--foreground);
+    border-radius: var(--radius);
+  }
+
+  .hljs-comment,
+  .hljs-quote {
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-subst {
+    color: var(--primary);
+    font-weight: bold;
+  }
+
+  .hljs-number,
+  .hljs-literal,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-tag .hljs-attr {
+    color: #e06c75;
+  }
+
+  .hljs-string,
+  .hljs-doctag {
+    color: #98c379;
+  }
+
+  .hljs-title,
+  .hljs-section,
+  .hljs-selector-id {
+    color: #d19a66;
+    font-weight: bold;
+  }
+
+  .hljs-subst {
+    font-weight: normal;
+  }
+
+  .hljs-type,
+  .hljs-class .hljs-title {
+    color: #e5c07b;
+    font-weight: bold;
+  }
+
+  .hljs-tag,
+  .hljs-name,
+  .hljs-attribute {
+    color: #e06c75;
+    font-weight: normal;
+  }
+
+  .hljs-regexp,
+  .hljs-link {
+    color: #56b6c2;
+  }
+
+  .hljs-symbol,
+  .hljs-bullet {
+    color: #61afef;
+  }
+
+  .hljs-built_in,
+  .hljs-builtin-name {
+    color: #e06c75;
+  }
+
+  .hljs-meta {
+    color: #98c379;
+  }
+
+  .hljs-deletion {
+    background: #e06c75;
+  }
+
+  .hljs-addition {
+    background: #98c379;
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .hljs-strong {
+    font-weight: bold;
   }
 }

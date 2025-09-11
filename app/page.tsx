@@ -6,10 +6,11 @@ import { Footer } from "@/components/layout/footer";
 import { BlogCard } from "@/components/blog/blog-card";
 import { Button } from "@/components/ui/button";
 import { usePosts } from "@/hooks/use-api";
+import { useAuthStore } from "@/stores/auth-store";
 
 export default function HomePage() {
   const { data: posts, isLoading, error } = usePosts();
-
+  const { isAuthenticated } = useAuthStore();
   const featuredPosts = posts?.slice(0, 3) || [];
 
   return (
@@ -30,11 +31,13 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-2">
               <Link href="/blog">
-                <Button size="lg">Explore Blog</Button>
+                <Button size="lg">Start Reading</Button>
               </Link>
-              <Button variant="secondary" size="lg">
-                About Us
-              </Button>
+              <Link href={isAuthenticated ? "/blog/create" : "/auth/login"}>
+                <Button variant="secondary" size="lg">
+                  Start Writing
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
@@ -66,40 +69,11 @@ export default function HomePage() {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {featuredPosts.map((post, index) => (
-                    <BlogCard key={post.id} post={post} index={index} />
+                    <BlogCard key={post._id} post={post} index={index} />
                   ))}
-                </div>
-
-                <div className="text-center mt-12 animate-fade-in-delay-6">
-                  <Link href="/blog">
-                    <Button variant="accent" size="lg">
-                      View All Articles
-                    </Button>
-                  </Link>
                 </div>
               </>
             )}
-          </div>
-        </section>
-
-        <section className="py-16 px-4 flex justify-center">
-          <div className="container mx-auto max-w-2xl text-center">
-            <div className="animate-fade-in-delay-4">
-              <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
-              <p className="text-muted-foreground mb-8">
-                Subscribe to our newsletter to receive the latest articles
-                directly in your inbox.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="flex-1 px-4 py-2 rounded-lg border border-input bg-input focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-                />
-                <Button>Subscribe</Button>
-              </div>
-            </div>
           </div>
         </section>
       </main>

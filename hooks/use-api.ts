@@ -8,6 +8,7 @@ export const queryKeys = {
   posts: ["posts"] as const,
   post: (id: string) => ["posts", id] as const,
   postBySlug: (slug: string) => ["posts", "slug", slug] as const,
+  userPosts: (userId: string) => ["posts", "user", userId] as const,
 };
 
 export function usePosts() {
@@ -36,7 +37,7 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (post: Omit<BlogPost, "id">) => blogApi.createPost(post),
+    mutationFn: (post: Omit<BlogPost, "_id">) => blogApi.createPost(post),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts });
     },
@@ -81,5 +82,14 @@ export function useRegister() {
     mutationFn: authApi.register,
     retry: 1,
     retryDelay: 1000,
+  });
+}
+
+export function useUserPosts(userId: string) {
+  return useQuery({
+    queryKey: queryKeys.userPosts(userId),
+    queryFn: () => blogApi.getUserPosts(userId),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
   });
 }
