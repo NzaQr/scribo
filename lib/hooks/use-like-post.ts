@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { blogApi } from "@/lib/api";
+import { blogApi } from "@/lib/api/blog";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
 

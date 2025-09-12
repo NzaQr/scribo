@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRegisterForm } from "@/hooks/use-register-form";
+import { useRegisterForm } from "@/lib/hooks/use-register-form";
 
 export default function RegisterPage() {
   const { formData, errors, isLoading, handleInputChange, handleSubmit } =

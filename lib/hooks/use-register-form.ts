@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useRegister } from "./use-api";
+import { useRegister } from "./use-auth";
 import { useAuthStore } from "@/stores/auth-store";
 
 interface RegisterFormData {

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { authApi } from "@/lib/api";
+import { authApi } from "@/lib/api/auth";
 
 interface User {
   id: string;
@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
         const currentToken = get().token;
 
         if (currentToken && typeof window !== "undefined") {
-          import("@/lib/api").then(({ authApi }) => {
+          import("@/lib/api/auth").then(({ authApi }) => {
             authApi.logout(currentToken).catch(() => {});
           });
         }

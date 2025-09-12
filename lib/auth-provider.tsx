@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth-store";
-import { setAuthStoreReference } from "@/lib/api";
+import { setAuthStoreReference } from "@/lib/api/client";
 
 interface AuthProviderProps {
   children: React.ReactNode;

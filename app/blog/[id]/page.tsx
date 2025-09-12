@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { useDeletePost, usePost } from "@/hooks/use-api";
-import { useLikePost } from "@/hooks/use-like-post";
+import { useDeletePost, usePost } from "@/lib/hooks/use-blog";
+import { useLikePost } from "@/lib/hooks/use-like-post";
 import { Button } from "@/components/ui/button";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import {
@@ -45,10 +45,11 @@ export default function BlogPostPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleDelete = () => {
+    router.push("/blog");
+
     deletePost(postId, {
       onSuccess: () => {
         setShowDeleteModal(false);
-        router.push("/blog");
       },
     });
   };

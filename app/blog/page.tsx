@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/footer";
 import { BlogCard } from "@/components/blog/blog-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { usePosts } from "@/hooks/use-api";
+import { usePosts } from "@/lib/hooks/use-blog";
 import { useState } from "react";
 
 export default function BlogPage() {

@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BlogPost } from "@/lib/api";
+import { BlogPost } from "@/lib/types/blog";
 
 interface BlogCardProps {
   post: BlogPost;

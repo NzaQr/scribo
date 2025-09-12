@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useUserPosts } from "@/hooks/use-api";
+import { useUserPosts } from "@/lib/hooks/use-blog";
 import { useAuthStore } from "@/stores/auth-store";
 import { BlogCard } from "@/components/blog/blog-card";
 import { Plus, User, Calendar, FileText } from "lucide-react";

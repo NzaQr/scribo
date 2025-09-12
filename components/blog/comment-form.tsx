@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAddComment } from "@/hooks/use-api";
+import { useAddComment } from "@/lib/hooks/use-comments";
 import { useAuthStore } from "@/stores/auth-store";
 import { MessageSquare, Send } from "lucide-react";
 

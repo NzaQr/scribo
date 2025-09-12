@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useDeleteComment, useUpdateComment } from "@/hooks/use-api";
+import { useDeleteComment, useUpdateComment } from "@/lib/hooks/use-comments";
 import { useAuthStore } from "@/stores/auth-store";
 import {
   DropdownMenu,

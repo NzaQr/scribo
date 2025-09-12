@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { BlogCard } from "@/components/blog/blog-card";
 import { Button } from "@/components/ui/button";
-import { usePosts } from "@/hooks/use-api";
+import { usePosts } from "@/lib/hooks/use-blog";
 import { useAuthStore } from "@/stores/auth-store";
 
 export default function HomePage() {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
-import { useCreatePost } from "@/hooks/use-api";
+import { useCreatePost } from "@/lib/hooks/use-blog";
 import { toast } from "sonner";
 
 interface PostFormData {

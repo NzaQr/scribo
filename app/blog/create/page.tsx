@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuthStore } from "@/stores/auth-store";
 import { MarkdownEditor } from "@/components/blog/markdown-editor";
-import { useCreatePostForm } from "@/hooks/use-create-blog-form";
+import { useCreatePostForm } from "@/lib/hooks/use-create-blog-form";
 import { TagsInput } from "@/components/blog/tags-input";
 
 export default function CreateBlogPage() {
