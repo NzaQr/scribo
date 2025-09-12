@@ -68,13 +68,13 @@ export default function CreateBlogPage() {
                   >
                     Description
                   </label>
-                  <textarea
+                  <Input
                     id="description"
+                    type="text"
                     placeholder="Write a brief description of your post..."
                     value={formData.description}
                     onChange={(e) => updateField("description", e.target.value)}
-                    className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
-                    rows={3}
+                    className="w-full"
                     required
                   />
                 </div>

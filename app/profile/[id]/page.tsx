@@ -84,10 +84,12 @@ export default function UserProfilePage() {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                       <h1 className="text-3xl font-bold mb-2">
-                        {userInfo?.username || "Unknown User"}
+                        {isOwnProfile
+                          ? currentUser?.username
+                          : userInfo?.username || "Unknown User"}
                       </h1>
                       <p className="text-muted-foreground mb-4">
-                        {userInfo?.email}
+                        {isOwnProfile ? currentUser?.email : userInfo?.email}
                       </p>
 
                       <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
@@ -141,14 +143,6 @@ export default function UserProfilePage() {
                     ? "Start sharing your thoughts with the community by creating your first post."
                     : "This user hasn't published any posts yet."}
                 </p>
-                {isOwnProfile && (
-                  <Link href="/blog/create">
-                    <Button className="flex items-center gap-2">
-                      <Plus className="w-4 h-4" />
-                      Create Your First Post
-                    </Button>
-                  </Link>
-                )}
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

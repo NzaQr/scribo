@@ -26,9 +26,9 @@ export default function RegisterPage() {
         <div className="w-full max-w-md">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Crear Cuenta</CardTitle>
+              <CardTitle className="text-2xl">Create Account</CardTitle>
               <CardDescription>
-                Regístrate para comenzar a escribir y comentar
+                Register to start writing and commenting
               </CardDescription>
             </CardHeader>
 
@@ -47,7 +47,7 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="username"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-foreground"
                   >
                     Username
                   </label>
@@ -85,7 +85,7 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="email"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-foreground"
                   >
                     Email
                   </label>
@@ -119,7 +119,7 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="password"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-foreground"
                   >
                     Password
                   </label>
@@ -160,7 +160,7 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="confirmPassword"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-foreground"
                   >
                     Confirm Password
                   </label>

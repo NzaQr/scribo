@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import MarkdownViewer from "@/components/blog/markdown-viewer";
+import { CommentsSection } from "@/components/blog/comments-section";
 import { useAuthStore } from "@/stores/auth-store";
 import { useState } from "react";
 
@@ -206,6 +207,8 @@ export default function BlogPostPage() {
               <MarkdownViewer content={post.content} />
             </div>
           </article>
+
+          <CommentsSection postId={post._id} comments={post.comments} />
         </div>
       </main>
 

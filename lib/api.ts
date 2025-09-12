@@ -81,12 +81,10 @@ export interface BlogPost {
   };
   likes: number;
   comments: {
-    user: {
-      _id: string;
-      username: string;
-      email: string;
-    };
+    user: string;
+    username: string;
     comment: string;
+    _id: string;
   }[];
   userLiked: boolean;
   createdAt: Date;
@@ -129,6 +127,20 @@ export const blogApi = {
   addComment: async (postId: string, comment: string) => {
     const res = await authenticatedApi.post<BlogPost>(
       `/api/posts/${postId}/comment`,
+      { comment }
+    );
+    return res.data;
+  },
+  deleteComment: async (postId: string, commentId: string) => {
+    const res = await authenticatedApi.delete<BlogPost>(
+      `/api/posts/${postId}/comment/${commentId}`
+    );
+    return res.data;
+  },
+
+  updateComment: async (postId: string, commentId: string, comment: string) => {
+    const res = await authenticatedApi.put<BlogPost>(
+      `/api/posts/${postId}/comment/${commentId}`,
       { comment }
     );
     return res.data;

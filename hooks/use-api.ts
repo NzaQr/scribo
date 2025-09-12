@@ -113,3 +113,54 @@ export function useUserPosts(userId: string) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
+export function useAddComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ postId, comment }: { postId: string; comment: string }) =>
+      blogApi.addComment(postId, comment),
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(queryKeys.post(variables.postId), data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+    },
+  });
+}
+
+export function useDeleteComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      postId,
+      commentId,
+    }: {
+      postId: string;
+      commentId: string;
+    }) => blogApi.deleteComment(postId, commentId),
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(queryKeys.post(variables.postId), data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+    },
+  });
+}
+
+export function useUpdateComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      postId,
+      commentId,
+      comment,
+    }: {
+      postId: string;
+      commentId: string;
+      comment: string;
+    }) => blogApi.updateComment(postId, commentId, comment),
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(queryKeys.post(variables.postId), data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+    },
+  });
+}
