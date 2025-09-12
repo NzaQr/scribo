@@ -79,9 +79,18 @@ export interface BlogPost {
     username: string;
     email: string;
   };
+  likes: number;
+  comments: {
+    user: {
+      _id: string;
+      username: string;
+      email: string;
+    };
+    comment: string;
+  }[];
+  userLiked: boolean;
   createdAt: Date;
   tags: string[];
-  slug?: string;
 }
 
 export const blogApi = {
@@ -91,9 +100,10 @@ export const blogApi = {
     return res.data;
   },
 
-  getPost: async (id: string, token?: string) => {
+  getPost: async (id: string, token?: string, userId?: string) => {
     const client = token ? authenticatedApi : api;
-    const res = await client.get<BlogPost>(`/api/posts/${id}`);
+    const params = userId ? { userId } : {};
+    const res = await client.get<BlogPost>(`/api/posts/${id}`, { params });
     return res.data;
   },
 
@@ -113,6 +123,21 @@ export const blogApi = {
 
   getUserPosts: async (userId: string) => {
     const res = await api.get<BlogPost[]>(`/api/posts/user/${userId}`);
+    return res.data;
+  },
+
+  addComment: async (postId: string, comment: string) => {
+    const res = await authenticatedApi.post<BlogPost>(
+      `/api/posts/${postId}/comment`,
+      { comment }
+    );
+    return res.data;
+  },
+
+  addLike: async (postId: string) => {
+    const res = await authenticatedApi.post<BlogPost>(
+      `/api/posts/${postId}/like`
+    );
     return res.data;
   },
 };

@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Eye, Edit3, Code } from "lucide-react";
+import { Eye, Edit3, Code, Link, Bold, Italic } from "lucide-react";
 
 interface MarkdownEditorProps {
   value: string;
@@ -57,9 +57,14 @@ export function MarkdownEditor({
   };
 
   const markdownButtons = [
-    { label: "Bold", before: "**", after: "**", icon: "B" },
-    { label: "Italic", before: "*", after: "*", icon: "I" },
-    { label: "Link", before: "[", after: "](url)", icon: "🔗" },
+    { label: "Bold", before: "**", after: "**", icon: <Bold /> },
+    { label: "Italic", before: "*", after: "*", icon: <Italic /> },
+    {
+      label: "Link",
+      before: "[",
+      after: "](url)",
+      icon: <Link />,
+    },
     { label: "Code", before: "`", after: "`", icon: "<>" },
     { label: "Code Block", before: "```\n", after: "\n```", icon: "```" },
     { label: "Quote", before: "> ", after: "", icon: "❝" },
@@ -111,7 +116,7 @@ export function MarkdownEditor({
               size="sm"
               onClick={() => insertMarkdown(button.before, button.after)}
               title={button.label}
-              className="h-8 w-8 p-0"
+              className="h-16 w-16 p-0"
             >
               {button.icon}
             </Button>

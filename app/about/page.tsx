@@ -62,9 +62,9 @@ export default function AboutPage() {
             <div className="fade-in-delay-4">
               <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
               <p className="text-muted-foreground mb-8">
-                Ready to start your learning journey with us? Explore our
-                articles and join thousands of developers who trust Scribo for
-                quality content.
+                Ready to start your learning journey with us? Explore our posts
+                and join thousands of developers who trust Scribo for quality
+                content.
               </p>
               <Link href="/blog">
                 <Button size="lg">Start Reading</Button>

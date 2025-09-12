@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuthStore } from "@/stores/auth-store";
 import { MarkdownEditor } from "@/components/blog/markdown-editor";
-import { useCreateBlogForm } from "@/hooks/use-create-blog-form";
+import { useCreatePostForm } from "@/hooks/use-create-blog-form";
+import { TagsInput } from "@/components/blog/tags-input";
 
 export default function CreateBlogPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   const { formData, isSubmitting, updateField, submitForm } =
-    useCreateBlogForm();
+    useCreatePostForm();
 
   if (!isAuthenticated) {
     router.push("/auth/login");
@@ -33,7 +34,7 @@ export default function CreateBlogPage() {
       <main className="flex-1 py-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Create New Blog</h1>
+            <h1 className="text-3xl font-bold mb-2">Create New Post</h1>
             <p className="text-muted-foreground">
               Share your ideas and knowledge with the community
             </p>
@@ -47,7 +48,7 @@ export default function CreateBlogPage() {
                     htmlFor="title"
                     className="block text-sm font-medium mb-2"
                   >
-                    Blog Title
+                    Post Title
                   </label>
                   <Input
                     id="title"
@@ -69,7 +70,7 @@ export default function CreateBlogPage() {
                   </label>
                   <textarea
                     id="description"
-                    placeholder="Write a brief description of your blog..."
+                    placeholder="Write a brief description of your post..."
                     value={formData.description}
                     onChange={(e) => updateField("description", e.target.value)}
                     className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
@@ -86,7 +87,7 @@ export default function CreateBlogPage() {
                   htmlFor="content"
                   className="block text-sm font-medium mb-2"
                 >
-                  Blog Content
+                  Post Content
                 </label>
                 <MarkdownEditor
                   value={formData.content}
@@ -94,6 +95,14 @@ export default function CreateBlogPage() {
                   placeholder="Write your content in Markdown..."
                 />
               </div>
+            </Card>
+
+            <Card className="p-6">
+              <TagsInput
+                id="tags"
+                value={formData.tags}
+                onChange={(value) => updateField("tags", value)}
+              />
             </Card>
 
             <div className="flex justify-end space-x-4">
@@ -110,7 +119,7 @@ export default function CreateBlogPage() {
                 disabled={isSubmitting}
                 className="min-w-[120px]"
               >
-                {isSubmitting ? "Creating..." : "Create Blog"}
+                {isSubmitting ? "Publishing..." : "Publish"}
               </Button>
             </div>
           </form>

@@ -11,7 +11,8 @@ import { useAuthStore } from "@/stores/auth-store";
 export default function HomePage() {
   const { data: posts, isLoading, error } = usePosts();
   const { isAuthenticated } = useAuthStore();
-  const featuredPosts = posts?.slice(0, 3) || [];
+  const featuredPosts =
+    posts?.filter((post) => post.likes >= 0).slice(0, 3) || [];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -45,9 +46,9 @@ export default function HomePage() {
         <section className="py-16 px-4 bg-muted/30 flex justify-center">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-12 animate-fade-in-delay-3">
-              <h2 className="text-3xl font-bold mb-4">Featured Articles</h2>
+              <h2 className="text-3xl font-bold mb-4">Featured Posts</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Discover our most popular articles about web development, design
+                Discover our most popular posts about web development, design
                 and the latest technology trends.
               </p>
             </div>
@@ -56,13 +57,13 @@ export default function HomePage() {
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                 <p className="text-muted-foreground">
-                  Cargando artículos destacados...
+                  Loading featured posts...
                 </p>
               </div>
             ) : error ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">
-                  Error loading featured articles
+                  Error loading featured posts
                 </p>
               </div>
             ) : (

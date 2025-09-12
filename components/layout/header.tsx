@@ -43,7 +43,7 @@ export function Header() {
               href="/blog"
               className="text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
-              Blog
+              Browse
             </Link>
             <Link
               href="/about"
@@ -91,7 +91,7 @@ export function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/blog/create">
+                    <Link href="/blog/create" className="cursor-pointer">
                       <Plus className="mr-2 h-4 w-4" />
                       <span>Create Post</span>
                     </Link>

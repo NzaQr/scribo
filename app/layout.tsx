@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-client";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/lib/authProvider";
+import { AuthProvider } from "@/lib/auth-provider";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {

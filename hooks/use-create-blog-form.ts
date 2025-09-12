@@ -6,23 +6,25 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useCreatePost } from "@/hooks/use-api";
 import { toast } from "sonner";
 
-interface BlogFormData {
+interface PostFormData {
   title: string;
   description: string;
   content: string;
+  tags: string[];
 }
 
-export function useCreateBlogForm() {
+export function useCreatePostForm() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
   const createPostMutation = useCreatePost();
-  const [formData, setFormData] = useState<BlogFormData>({
+  const [formData, setFormData] = useState<PostFormData>({
     title: "",
     description: "",
     content: "",
+    tags: [],
   });
 
-  const updateField = (field: keyof BlogFormData, value: string) => {
+  const updateField = (field: keyof PostFormData, value: string | string[]) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -34,6 +36,7 @@ export function useCreateBlogForm() {
       title: "",
       description: "",
       content: "",
+      tags: [],
     });
   };
 
@@ -55,7 +58,7 @@ export function useCreateBlogForm() {
 
   const submitForm = async (): Promise<boolean> => {
     if (!isAuthenticated) {
-      toast.error("You must be authenticated to create a blog");
+      toast.error("You must be authenticated to create a post");
       router.push("/auth/login");
       return false;
     }
@@ -74,16 +77,19 @@ export function useCreateBlogForm() {
           username: user?.username || "",
           email: user?.email || "",
         },
+        likes: 0,
+        comments: [],
         createdAt: new Date(),
-        tags: [],
+        tags: formData.tags,
+        userLiked: false,
       });
 
-      toast.success("Blog created successfully!");
+      toast.success("Post created successfully!");
       router.push(`/blog/${newPost._id}`);
       return true;
     } catch (error) {
-      console.error("Error creating blog:", error);
-      toast.error("Error creating blog. Please try again.");
+      console.error("Error creating post:", error);
+      toast.error("Error creating post. Please try again.");
       return false;
     }
   };

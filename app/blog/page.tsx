@@ -31,7 +31,7 @@ export default function BlogPage() {
         <section className="py-16 px-4 bg-muted/30 flex justify-center">
           <div className="container mx-auto max-w-4xl text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 fade-in">
-              Articles
+              Posts
             </h1>
 
             <p className="text-xl text-muted-foreground mb-8 fade-in-delay-1">
@@ -40,7 +40,7 @@ export default function BlogPage() {
 
             <div className="max-w-md mx-auto flex gap-2 fade-in-delay-2">
               <Input
-                placeholder="Search articles..."
+                placeholder="Search posts..."
                 className="flex-1"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -55,11 +55,11 @@ export default function BlogPage() {
             {isLoading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Loading articles...</p>
+                <p className="text-muted-foreground">Loading posts...</p>
               </div>
             ) : error ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">Error loading articles</p>
+                <p className="text-muted-foreground">Error loading posts</p>
               </div>
             ) : (
               <>

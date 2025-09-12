@@ -24,10 +24,11 @@ export function usePosts() {
 
 export function usePost(id: string) {
   const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.user?.id);
 
   return useQuery({
     queryKey: queryKeys.post(id),
-    queryFn: () => blogApi.getPost(id, token || undefined),
+    queryFn: () => blogApi.getPost(id, token || undefined, userId),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
@@ -62,8 +63,27 @@ export function useDeletePost() {
 
   return useMutation({
     mutationFn: (id: string) => blogApi.deletePost(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.post(id) });
+
+      const previousPost = queryClient.getQueryData(queryKeys.post(id));
+
+      queryClient.removeQueries({ queryKey: queryKeys.post(id) });
+
+      return { previousPost };
+    },
+    onSuccess: (_, id) => {
+      queryClient.setQueryData(queryKeys.posts, (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.filter((post: any) => post._id !== id);
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["posts", "user"] });
+    },
+    onError: (err, id, context) => {
+      if (context?.previousPost) {
+        queryClient.setQueryData(queryKeys.post(id), context.previousPost);
+      }
     },
   });
 }
