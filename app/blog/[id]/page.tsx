@@ -21,6 +21,7 @@ import {
   Heart,
   Trash,
   MoreVertical,
+  Edit,
 } from "lucide-react";
 import Link from "next/link";
 import MarkdownViewer from "@/components/blog/markdown-viewer";
@@ -123,6 +124,15 @@ export default function BlogPostPage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/blog/${postId}/edit`}
+                      className="flex items-center"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit post
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleDeleteClick}
                     className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
