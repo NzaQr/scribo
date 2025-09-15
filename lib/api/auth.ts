@@ -1,33 +1,40 @@
 import { publicApi } from "./client";
-import { LoginData, RegisterData } from "@/lib/types/blog";
+import { ApiResponse } from "@/lib/types/api";
+import {
+  LoginData,
+  RegisterData,
+  AuthData,
+  TokenData,
+  VerifyResponse,
+} from "@/lib/types/auth";
 
 export const authApi = {
   login: (data: LoginData) =>
-    publicApi.post("/api/auth/login", data).then((res) => res.data),
+    publicApi
+      .post<ApiResponse<AuthData>>("/api/auth/login", data)
+      .then((res) => res.data.data),
 
   register: (data: RegisterData) =>
-    publicApi.post("/api/auth/register", data).then((res) => res.data),
+    publicApi
+      .post<ApiResponse<AuthData>>("/api/auth/register", data)
+      .then((res) => res.data.data),
 
   refreshToken: (refreshToken: string) =>
     publicApi
-      .post("/api/auth/refresh", { refreshToken })
-      .then((res) => res.data),
+      .post<ApiResponse<TokenData>>("/api/auth/refresh", { refreshToken })
+      .then((res) => res.data.data),
 
   verifyToken: (token: string) =>
     publicApi
-      .get("/api/auth/verify", {
+      .get<ApiResponse<VerifyResponse>>("/api/auth/verify", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => res.data),
+      .then((res) => res.data.data),
 
-  logout: (token: string) =>
+  logout: (refreshToken: string) =>
     publicApi
-      .post(
-        "/api/auth/logout",
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
+      .post<ApiResponse<{ message: string }>>("/api/auth/logout", {
+        refreshToken,
+      })
       .then((res) => res.data),
 };

@@ -45,9 +45,9 @@ const createAuthApi = () => {
 
           authStore
             ?.getState?.()
-            ?.updateTokens?.(data.token, data.refreshToken);
+            ?.updateTokens?.(data.data.token, data.data.refreshToken);
 
-          originalRequest.headers.Authorization = `Bearer ${data.token}`;
+          originalRequest.headers.Authorization = `Bearer ${data.data.token}`;
           return authApi(originalRequest);
         } catch {
           authStore?.getState?.()?.logout?.();

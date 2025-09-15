@@ -3,12 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { authApi } from "@/lib/api/auth";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-}
+import { User } from "@/lib/types/auth";
 
 interface AuthState {
   user: User | null;
@@ -44,11 +39,11 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        const currentToken = get().token;
+        const currentRefreshToken = get().refreshToken;
 
-        if (currentToken && typeof window !== "undefined") {
+        if (currentRefreshToken && typeof window !== "undefined") {
           import("@/lib/api/auth").then(({ authApi }) => {
-            authApi.logout(currentToken).catch(() => {});
+            authApi.logout(currentRefreshToken).catch(() => {});
           });
         }
 

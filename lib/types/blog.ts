@@ -24,14 +24,3 @@ export interface Comment {
 
 export type CreatePostData = Omit<BlogPost, "_id">;
 export type UpdatePostData = Partial<BlogPost>;
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  email: string;
-  password: string;
-  username: string;
-}
