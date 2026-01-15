@@ -17,11 +17,6 @@ export interface TokenData {
   refreshToken: string;
 }
 
-export interface VerifyResponse {
-  valid: boolean;
-  user: User;
-}
-
 export interface LoginData {
   email: string;
   password: string;

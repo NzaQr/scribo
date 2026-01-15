@@ -77,38 +77,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       verifyAuth: async (): Promise<boolean> => {
-        const { token, refreshToken } = get();
+        const { token } = get();
 
         if (!token) {
           set({ isAuthenticated: false, isLoading: false });
           return false;
         }
-
-        try {
-          await authApi.verifyToken(token);
-          set({ isAuthenticated: true, isLoading: false });
-          return true;
-        } catch (error) {
-          if (refreshToken) {
-            try {
-              const newTokens = await authApi.refreshToken(refreshToken);
-
-              set({
-                token: newTokens.token,
-                refreshToken: newTokens.refreshToken,
-                isAuthenticated: true,
-                isLoading: false,
-              });
-              return true;
-            } catch (refreshError) {
-              get().logout();
-              return false;
-            }
-          } else {
-            get().logout();
-            return false;
-          }
-        }
+        set({ isAuthenticated: true, isLoading: false });
+        return true;
       },
     }),
     {

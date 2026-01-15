@@ -1,12 +1,6 @@
 import { publicApi } from "./client";
 import { ApiResponse } from "@/lib/types/api";
-import {
-  LoginData,
-  RegisterData,
-  AuthData,
-  TokenData,
-  VerifyResponse,
-} from "@/lib/types/auth";
+import { LoginData, RegisterData, AuthData, TokenData } from "@/lib/types/auth";
 
 export const authApi = {
   login: (data: LoginData) =>
@@ -22,13 +16,6 @@ export const authApi = {
   refreshToken: (refreshToken: string) =>
     publicApi
       .post<ApiResponse<TokenData>>("/api/auth/refresh", { refreshToken })
-      .then((res) => res.data.data),
-
-  verifyToken: (token: string) =>
-    publicApi
-      .get<ApiResponse<VerifyResponse>>("/api/auth/verify", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
       .then((res) => res.data.data),
 
   logout: (refreshToken: string) =>
