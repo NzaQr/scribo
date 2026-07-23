@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { useAddComment } from "@/lib/hooks/use-comments";
 import { useAuthStore } from "@/stores/auth-store";
-import { MessageSquare, Send } from "lucide-react";
+import { Comment01Icon, SentIcon } from "@hugeicons/core-free-icons";
+import Link from "next/link";
 
 interface CommentFormProps {
   postId: string;
@@ -33,66 +35,62 @@ export function CommentForm({ postId, onCommentAdded }: CommentFormProps) {
     );
   };
 
-  const handleCancel = () => {
-    setComment("");
-    setIsExpanded(false);
-  };
-
   if (!user) {
     return (
-      <div className="mt-8 p-4 border rounded-lg bg-muted/50">
-        <p className="text-sm text-muted-foreground text-center">
-          You must be logged in to leave a comment.
-        </p>
+      <div className="border border-dashed border-border px-4 py-5 text-center text-sm text-muted-foreground">
+        <Link href="/auth/login" className="text-accent hover:underline">
+          Sign in
+        </Link>{" "}
+        to leave a comment.
       </div>
     );
   }
 
   return (
-    <div className="mt-8 space-y-4">
+    <div className="space-y-4">
       {!isExpanded ? (
         <Button
-          variant="ghost"
+          variant="outline"
           onClick={() => setIsExpanded(true)}
-          className="flex items-center gap-2"
+          className="gap-2"
         >
-          <MessageSquare className="w-4 h-4" />
+          <Icon icon={Comment01Icon} size={16} />
           Leave a comment
         </Button>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="comment" className="text-sm font-medium">
-              Your comment
-            </label>
-            <textarea
-              id="comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Write your comment here..."
-              className="w-full min-h-[100px] p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              disabled={isPending}
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <label htmlFor="comment" className="block text-sm font-medium">
+            Your comment
+          </label>
+          <textarea
+            id="comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Write thoughtfully..."
+            className="min-h-[110px] w-full resize-y rounded-md border border-border bg-input p-3 text-base leading-relaxed shadow-[var(--shadow-sm)] focus:outline-none focus:ring-2 focus:ring-ring"
+            disabled={isPending}
+          />
           <div className="flex gap-2">
             <Button
               type="submit"
               disabled={!comment.trim() || isPending}
-              className="flex items-center gap-2"
+              className="gap-2"
             >
               {isPending ? (
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                <Send className="w-4 h-4" />
+                <Icon icon={SentIcon} size={16} />
               )}
               {isPending ? "Sending..." : "Comment"}
             </Button>
             <Button
               type="button"
               variant="ghost"
-              onClick={handleCancel}
+              onClick={() => {
+                setComment("");
+                setIsExpanded(false);
+              }}
               disabled={isPending}
-              className="flex items-center gap-2"
             >
               Cancel
             </Button>

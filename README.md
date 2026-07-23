@@ -1,3 +1,18 @@
 # Scribo
 
-A clean, minimalist blog built with Next.js, featuring a custom design system with pastel colors and smooth animations.
+A calm editorial room for sharing ideas on web development, design, and technology.
+
+## Setup
+
+This project uses **pnpm** only (npm/yarn installs are blocked).
+
+```bash
+pnpm install
+pnpm dev
+```
+
+```bash
+pnpm build
+pnpm start
+pnpm lint
+```

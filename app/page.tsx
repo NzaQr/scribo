@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { BlogCard } from "@/components/blog/blog-card";
+import { PostRow } from "@/components/blog/blog-card";
 import { Button } from "@/components/ui/button";
 import { usePosts } from "@/lib/hooks/use-blog";
 import { useAuthStore } from "@/stores/auth-store";
@@ -11,69 +11,95 @@ import { useAuthStore } from "@/stores/auth-store";
 export default function HomePage() {
   const { data: posts, isLoading, error } = usePosts();
   const { isAuthenticated } = useAuthStore();
-  const featuredPosts =
-    posts?.filter((post) => post.likes >= 0).slice(0, 3) || [];
+  const featuredPosts = posts?.slice(0, 4) || [];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell">
       <Header />
 
-      <main className="flex-1">
-        <section className="py-20 px-4 flex justify-center">
-          <div className="container mx-auto text-center max-w-4xl">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-              Welcome to <span className="text-primary">Scribo</span>
-            </h1>
-
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in-delay-1">
-              A minimalist space to share ideas, experiences and knowledge about
-              web development, design and technology.
+      <main id="main-content" className="flex-1">
+        <section className="relative flex min-h-[calc(100dvh-4rem)] items-center">
+          <div className="container-editorial w-full animate-page-enter py-16 md:py-20">
+            <p className="brand-mark mb-8 text-[clamp(3.25rem,8vw,6.5rem)] leading-[0.92]">
+              Scribo
             </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-2">
+            <h1 className="max-w-xl font-serif text-[clamp(1.6rem,2.4vw,2.15rem)] font-normal leading-[1.2] tracking-tight text-foreground">
+              A room for writing about the craft of the web.
+            </h1>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Share ideas on development, design, and technology with a calm
+              reading experience.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link href="/blog">
-                <Button size="lg">Start Reading</Button>
+                <Button size="lg">Start reading</Button>
               </Link>
               <Link href={isAuthenticated ? "/blog/create" : "/auth/login"}>
                 <Button variant="secondary" size="lg">
-                  Start Writing
+                  Start writing
                 </Button>
               </Link>
             </div>
           </div>
         </section>
 
-        <section className="py-16 px-4 bg-muted/30 flex justify-center">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-12 animate-fade-in-delay-3">
-              <h2 className="text-3xl font-bold mb-4">Featured Posts</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Discover our most popular posts about web development, design
-                and the latest technology trends.
+        <section className="border-t border-border">
+          <div className="container-editorial py-16 md:py-20">
+            <div className="mb-10 max-w-xl">
+              <h2 className="font-serif text-3xl font-normal tracking-tight md:text-4xl">
+                Featured writing
+              </h2>
+              <p className="mt-3 text-muted-foreground">
+                Recent posts from the community, arranged for reading rather
+                than browsing cards.
               </p>
             </div>
 
             {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-muted-foreground">
-                  Loading featured posts...
-                </p>
+              <div className="space-y-0 divide-y divide-border">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="space-y-3 py-6">
+                    <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+                    <div className="h-7 w-3/4 animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-full max-w-lg animate-pulse rounded bg-muted" />
+                  </div>
+                ))}
               </div>
             ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">
-                  Error loading featured posts
+              <p className="py-8 text-muted-foreground">
+                Could not load featured posts.
+              </p>
+            ) : featuredPosts.length === 0 ? (
+              <div className="border border-dashed border-border py-14 text-center">
+                <p className="font-serif text-2xl">No posts yet</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Be the first to publish something worth reading.
                 </p>
+                <Link
+                  href={isAuthenticated ? "/blog/create" : "/auth/register"}
+                  className="mt-6 inline-block"
+                >
+                  <Button>Write a post</Button>
+                </Link>
               </div>
             ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {featuredPosts.map((post, index) => (
-                    <BlogCard key={post._id} post={post} index={index} />
-                  ))}
+              <div>
+                {featuredPosts.map((post, index) => (
+                  <PostRow
+                    key={post._id}
+                    post={post}
+                    featured={index === 0}
+                  />
+                ))}
+                <div className="pt-8">
+                  <Link
+                    href="/blog"
+                    className="text-sm font-medium text-accent transition-colors hover:text-foreground"
+                  >
+                    Browse all posts
+                  </Link>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </section>

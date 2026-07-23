@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/footer";
 import { useDeletePost, usePost } from "@/lib/hooks/use-blog";
 import { useLikePost } from "@/lib/hooks/use-like-post";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import {
   DropdownMenu,
@@ -14,20 +15,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ArrowLeft,
-  Calendar,
-  Clock,
-  User,
-  Heart,
-  Trash,
-  MoreVertical,
-  Edit,
-} from "lucide-react";
+  ArrowLeft01Icon,
+  Delete02Icon,
+  FavouriteIcon,
+  MoreVerticalIcon,
+  PencilEdit02Icon,
+} from "@hugeicons/core-free-icons";
 import Link from "next/link";
-import MarkdownViewer from "@/components/blog/markdown-viewer";
+import { MarkdownRenderer } from "@/components/blog/markdown-renderer";
 import { CommentsSection } from "@/components/blog/comments-section";
 import { useAuthStore } from "@/stores/auth-store";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -47,7 +46,6 @@ export default function BlogPostPage() {
 
   const handleDelete = () => {
     router.push("/blog");
-
     deletePost(postId, {
       onSuccess: () => {
         setShowDeleteModal(false);
@@ -55,20 +53,16 @@ export default function BlogPostPage() {
     });
   };
 
-  const handleDeleteClick = () => {
-    setShowDeleteModal(true);
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="page-shell">
         <Header />
-        <main className="flex-1 py-8 px-4">
-          <div className="container mx-auto max-w-4xl">
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading post...</p>
-            </div>
+        <main className="flex-1 py-12">
+          <div className="container-editorial max-w-3xl space-y-4">
+            <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+            <div className="h-12 w-full animate-pulse rounded bg-muted" />
+            <div className="h-6 w-3/4 animate-pulse rounded bg-muted" />
+            <div className="h-40 w-full animate-pulse rounded bg-muted" />
           </div>
         </main>
         <Footer />
@@ -78,19 +72,17 @@ export default function BlogPostPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="page-shell">
         <Header />
-        <main className="flex-1 py-8 px-4">
-          <div className="container mx-auto max-w-4xl">
-            <div className="text-center py-12">
-              <h1 className="text-2xl font-bold mb-4">Post not found</h1>
-              <p className="text-muted-foreground mb-6">
-                The post you're looking for doesn't exist or has been deleted.
-              </p>
-              <Link href="/blog">
-                <Button>Back to Blog</Button>
-              </Link>
-            </div>
+        <main className="flex-1 py-20">
+          <div className="container-editorial max-w-3xl text-center">
+            <h1 className="font-serif text-3xl">Post not found</h1>
+            <p className="mt-3 text-muted-foreground">
+              This post does not exist or has been deleted.
+            </p>
+            <Link href="/blog" className="mt-8 inline-block">
+              <Button>Back to posts</Button>
+            </Link>
           </div>
         </main>
         <Footer />
@@ -99,45 +91,40 @@ export default function BlogPostPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell">
       <Header />
 
-      <main className="flex-1 py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="mb-6 flex justify-between items-center">
+      <main id="main-content" className="flex-1 py-8 md:py-12">
+        <div className="container-editorial max-w-3xl animate-page-enter">
+          <div className="mb-8 flex items-center justify-between">
             <Link href="/blog">
-              <Button variant="ghost" size="sm" className="mb-4">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Blog
+              <Button variant="ghost" size="sm" className="gap-2 px-0">
+                <Icon icon={ArrowLeft01Icon} size={16} />
+                Back
               </Button>
             </Link>
             {post.author._id === user?.id && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="mb-4 h-9 w-9 p-0 hover:bg-muted"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                    <span className="sr-only">Open options menu</span>
+                  <Button variant="ghost" size="icon" aria-label="Post options">
+                    <Icon icon={MoreVerticalIcon} size={18} />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-44">
                   <DropdownMenuItem asChild>
                     <Link
                       href={`/blog/${postId}/edit`}
                       className="flex items-center"
                     >
-                      <Edit className="w-4 h-4 mr-2" />
+                      <Icon icon={PencilEdit02Icon} size={16} className="mr-2" />
                       Edit post
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={handleDeleteClick}
-                    className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+                    onClick={() => setShowDeleteModal(true)}
+                    className="text-danger focus:text-danger"
                   >
-                    <Trash className="w-4 h-4 mr-2" />
+                    <Icon icon={Delete02Icon} size={16} className="mr-2" />
                     Delete post
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -145,78 +132,59 @@ export default function BlogPostPage() {
             )}
           </div>
 
-          <article className="space-y-6">
-            <header className="space-y-4">
-              <div className="flex flex-wrap gap-2 mb-2">
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+          <article>
+            <header className="mb-10 space-y-5">
+              {post.tags.length > 0 && (
+                <p className="meta-label">{post.tags.join(" · ")}</p>
+              )}
+              <h1 className="font-serif text-[clamp(2.2rem,4.5vw,3.35rem)] font-normal leading-[1.12] tracking-tight">
                 {post.title}
               </h1>
+              {post.description && (
+                <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
+                  {post.description}
+                </p>
+              )}
 
-              <p className="text-xl text-muted-foreground leading-relaxed">
-                {post.description}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-border py-4 font-mono text-xs tabular-nums text-muted-foreground">
                 <Link
                   href={`/profile/${post.author._id}`}
-                  className="flex items-center gap-2 hover:text-primary transition-colors"
+                  className="transition-colors hover:text-foreground"
                 >
-                  <User className="w-4 h-4" />
-                  <span>{post.author.username}</span>
+                  {post.author.username}
                 </Link>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {new Date(post.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  <span>{readTime} min read</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <time dateTime={new Date(post.createdAt).toISOString()}>
+                  {new Date(post.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+                {readTime ? <span>{readTime} min read</span> : null}
+                <button
+                  type="button"
                   onClick={handleLike}
                   disabled={isLikeLoading}
-                  className={`flex items-center gap-2 border transition-all duration-200 ${
+                  className={cn(
+                    "ml-auto inline-flex items-center gap-1.5 transition-colors",
                     isLiked
-                      ? "text-red-500 border-red-500 hover:bg-red-50 dark:hover:bg-red-950"
-                      : "border-border hover:text-red-500 hover:border-red-500"
-                  }`}
+                      ? "text-danger"
+                      : "hover:text-foreground"
+                  )}
+                  aria-pressed={isLiked}
+                  aria-label={isLiked ? "Unlike post" : "Like post"}
                 >
-                  <Heart
-                    className={`w-4 h-4 transition-all duration-200 ${
-                      isLiked ? "fill-current" : ""
-                    }`}
+                  <Icon
+                    icon={FavouriteIcon}
+                    size={15}
+                    className={isLiked ? "fill-current" : undefined}
                   />
                   <span>{likes}</span>
-                  {isLikeLoading && (
-                    <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-                  )}
-                </Button>
+                </button>
               </div>
             </header>
 
-            <div className="prose prose-lg max-w-none dark:prose-invert">
-              <MarkdownViewer content={post.content} />
-            </div>
+            <MarkdownRenderer content={post.content} />
           </article>
 
           <CommentsSection postId={post._id} comments={post.comments} />
@@ -230,12 +198,11 @@ export default function BlogPostPage() {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
         title="Delete post"
-        description={`Are you sure you want to delete "${post?.title}"? This action cannot be undone.`}
+        description={`Delete “${post?.title}”? This cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         isLoading={isDeleteLoading}
-        variant="primary"
-        confirmButtonClassName="bg-red-600 hover:bg-red-700 text-white"
+        variant="secondary"
       />
     </div>
   );

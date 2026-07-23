@@ -2,7 +2,6 @@
 
 import { Comment } from "./comment";
 import { CommentForm } from "./comment-form";
-import { MessageSquare } from "lucide-react";
 
 interface CommentsSectionProps {
   postId: string;
@@ -17,26 +16,29 @@ interface CommentsSectionProps {
 
 export function CommentsSection({ postId, comments }: CommentsSectionProps) {
   return (
-    <div className="mt-12 space-y-6">
-      <div className="flex items-center gap-2">
-        <MessageSquare className="w-5 h-5" />
-        <h2 className="text-xl font-semibold">Comments ({comments.length})</h2>
+    <section className="mt-16 border-t border-border pt-10">
+      <h2 className="font-serif text-2xl font-normal tracking-tight">
+        Conversation
+        <span className="ml-2 font-mono text-sm text-muted-foreground">
+          {comments.length}
+        </span>
+      </h2>
+
+      <div className="mt-6">
+        <CommentForm postId={postId} />
       </div>
 
-      <CommentForm postId={postId} />
-
       {comments.length > 0 ? (
-        <div className="space-y-4">
-          {comments.map((comment, index) => (
-            <Comment key={index} comment={comment} postId={postId} />
+        <div className="mt-8">
+          {comments.map((comment) => (
+            <Comment key={comment._id} comment={comment} postId={postId} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 text-muted-foreground">
-          <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No comments yet. Be the first to comment!</p>
-        </div>
+        <p className="mt-8 text-sm text-muted-foreground">
+          No comments yet. Start the conversation.
+        </p>
       )}
-    </div>
+    </section>
   );
 }

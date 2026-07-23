@@ -1,46 +1,54 @@
-"use client"
+import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t bg-muted/50 animate-fade-in-delay-2">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Scribo</h3>
-            <p className="text-sm text-muted-foreground">A minimalist blog to share ideas and experiences.</p>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-semibold mb-4">Links</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <a href="/" className="hover:text-primary transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="/blog" className="hover:text-primary transition-colors">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="/about" className="hover:text-primary transition-colors">
-                  About
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-semibold mb-4">Contact</h4>
-            <p className="text-sm text-muted-foreground">hello@scribo.com</p>
-          </div>
+    <footer className="mt-auto border-t border-border">
+      <div className="container-editorial grid gap-8 py-10 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div>
+          <p className="brand-mark mb-3 text-[1.35rem]">Scribo</p>
+          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+            A room for writing about web development, design, and technology.
+          </p>
         </div>
 
-        <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          © 2025 Scribo. All rights reserved.
+        <div>
+          <p className="meta-label mb-3">Navigate</p>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li>
+              <Link href="/" className="transition-colors hover:text-foreground">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/blog"
+                className="transition-colors hover:text-foreground"
+              >
+                Browse
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/about"
+                className="transition-colors hover:text-foreground"
+              >
+                About
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="meta-label mb-3">Contact</p>
+          <p className="text-sm text-muted-foreground">hello@scribo.com</p>
         </div>
       </div>
+
+      <div className="container-editorial border-t border-border py-5">
+        <p className="font-mono text-xs text-muted-foreground">
+          © {new Date().getFullYear()} Scribo
+        </p>
+      </div>
     </footer>
-  )
+  );
 }

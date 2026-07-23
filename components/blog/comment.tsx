@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  User,
-  Calendar,
-  Trash,
-  MoreVertical,
-  Pencil,
-  Check,
-  X,
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -21,6 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useState } from "react";
+import {
+  Cancel01Icon,
+  Delete02Icon,
+  MoreVerticalIcon,
+  PencilEdit02Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 
 interface CommentProps {
   comment: {
@@ -41,15 +40,6 @@ export function Comment({ comment, postId }: CommentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.comment);
 
-  const handleDelete = (commentId: string) => {
-    deleteComment({ postId, commentId });
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    setEditText(comment.comment);
-  };
-
   const handleSave = () => {
     if (editText.trim() && editText !== comment.comment) {
       updateComment({
@@ -61,36 +51,24 @@ export function Comment({ comment, postId }: CommentProps) {
     setIsEditing(false);
   };
 
-  const handleCancel = () => {
-    setEditText(comment.comment);
-    setIsEditing(false);
-  };
-
   return (
-    <div className="border-l-2 border-muted pl-4 py-3 space-y-2">
-      <div className="flex items-start justify-between gap-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2">
+    <div className="border-b border-border py-5 last:border-b-0">
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
           <Link
             href={`/profile/${comment.user}`}
-            className="flex items-center gap-1 hover:text-primary transition-colors"
+            className="font-medium text-foreground transition-colors hover:text-accent"
           >
-            <User className="w-3 h-3" />
-            <span className="font-medium">{comment.username}</span>
+            {comment.username}
           </Link>
           {comment.createdAt && (
-            <>
-              <span>•</span>
-              <div className="flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
-                <span>
-                  {new Date(comment.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
-              </div>
-            </>
+            <time dateTime={new Date(comment.createdAt).toISOString()}>
+              {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </time>
           )}
         </div>
         {comment.user === user?.id && (
@@ -98,26 +76,31 @@ export function Comment({ comment, postId }: CommentProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="sm"
-                className="h-9 w-9 p-0 hover:bg-muted"
+                size="icon"
+                className="h-8 w-8"
+                aria-label="Comment options"
               >
-                <MoreVertical className="w-4 h-4" />
+                <Icon icon={MoreVerticalIcon} size={16} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem
-                onClick={handleEdit}
-                className="text-blue-600 focus:text-blue-600 focus:bg-blue-50 dark:focus:bg-blue-950"
+                onClick={() => {
+                  setIsEditing(true);
+                  setEditText(comment.comment);
+                }}
               >
-                <Pencil className="w-4 h-4 mr-2" />
-                Edit comment
+                <Icon icon={PencilEdit02Icon} size={16} className="mr-2" />
+                Edit
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => handleDelete(comment._id)}
-                className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+                onClick={() =>
+                  deleteComment({ postId, commentId: comment._id })
+                }
+                className="text-danger focus:text-danger"
               >
-                <Trash className="w-4 h-4 mr-2" />
-                Delete comment
+                <Icon icon={Delete02Icon} size={16} className="mr-2" />
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -128,8 +111,7 @@ export function Comment({ comment, postId }: CommentProps) {
           <Input
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            placeholder="Escribe tu comentario..."
-            className="text-sm"
+            placeholder="Edit your comment..."
             autoFocus
           />
           <div className="flex gap-2">
@@ -137,24 +119,29 @@ export function Comment({ comment, postId }: CommentProps) {
               size="sm"
               onClick={handleSave}
               disabled={!editText.trim() || editText === comment.comment}
-              className="h-8 px-3"
+              className="gap-1"
             >
-              <Check className="w-3 h-3 mr-1" />
-              Guardar
+              <Icon icon={Tick02Icon} size={14} />
+              Save
             </Button>
             <Button
               size="sm"
               variant="ghost"
-              onClick={handleCancel}
-              className="h-8 px-3"
+              onClick={() => {
+                setEditText(comment.comment);
+                setIsEditing(false);
+              }}
+              className="gap-1"
             >
-              <X className="w-3 h-3 mr-1" />
-              Cancelar
+              <Icon icon={Cancel01Icon} size={14} />
+              Cancel
             </Button>
           </div>
         </div>
       ) : (
-        <p className="text-sm leading-relaxed">{comment.comment}</p>
+        <p className="text-sm leading-relaxed text-foreground">
+          {comment.comment}
+        </p>
       )}
     </div>
   );

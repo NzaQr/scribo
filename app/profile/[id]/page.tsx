@@ -4,11 +4,11 @@ import { useParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 import { useUserPosts } from "@/lib/hooks/use-blog";
 import { useAuthStore } from "@/stores/auth-store";
-import { BlogCard } from "@/components/blog/blog-card";
-import { Plus, User, Calendar, FileText } from "lucide-react";
+import { PostRow } from "@/components/blog/blog-card";
+import { Add01Icon, File01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 
 export default function UserProfilePage() {
@@ -21,14 +21,13 @@ export default function UserProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="page-shell">
         <Header />
-        <main className="flex-1 py-8 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading profile...</p>
-            </div>
+        <main className="flex-1 py-12">
+          <div className="container-editorial max-w-4xl space-y-4">
+            <div className="h-10 w-56 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-40 animate-pulse rounded bg-muted" />
+            <div className="mt-10 h-32 w-full animate-pulse rounded bg-muted" />
           </div>
         </main>
         <Footer />
@@ -38,19 +37,17 @@ export default function UserProfilePage() {
 
   if (error || !userPosts) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="page-shell">
         <Header />
-        <main className="flex-1 py-8 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center py-12">
-              <h1 className="text-2xl font-bold mb-4">Profile not found</h1>
-              <p className="text-muted-foreground mb-6">
-                The user profile you're looking for doesn't exist.
-              </p>
-              <Link href="/blog">
-                <Button>Back to Blog</Button>
-              </Link>
-            </div>
+        <main className="flex-1 py-20">
+          <div className="container-editorial max-w-4xl text-center">
+            <h1 className="font-serif text-3xl">Profile not found</h1>
+            <p className="mt-3 text-muted-foreground">
+              This author profile does not exist.
+            </p>
+            <Link href="/blog" className="mt-8 inline-block">
+              <Button>Back to posts</Button>
+            </Link>
           </div>
         </main>
         <Footer />
@@ -60,98 +57,73 @@ export default function UserProfilePage() {
 
   const userInfo = userPosts.length > 0 ? userPosts[0].author : null;
   const totalPosts = userPosts.length;
-  const totalWords = userPosts.reduce(
-    (acc, post) => acc + (post.content?.length || 0),
-    0
-  );
+  const displayName = isOwnProfile
+    ? currentUser?.username
+    : userInfo?.username || "Unknown author";
+  const displayEmail = isOwnProfile ? currentUser?.email : userInfo?.email;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell">
       <Header />
 
-      <main className="flex-1 py-8 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="mb-8">
-            <Card className="p-8">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center">
-                    <User className="w-12 h-12 text-primary" />
-                  </div>
-                </div>
-
-                <div className="flex-1">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div>
-                      <h1 className="text-3xl font-bold mb-2">
-                        {isOwnProfile
-                          ? currentUser?.username
-                          : userInfo?.username || "Unknown User"}
-                      </h1>
-                      <p className="text-muted-foreground mb-4">
-                        {isOwnProfile ? currentUser?.email : userInfo?.email}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4" />
-                          <span>
-                            {totalPosts} {totalPosts === 1 ? "post" : "posts"}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <span>~{Math.round(totalWords / 200)} min read</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {isOwnProfile && (
-                      <div className="flex gap-3">
-                        <Link href="/blog/create">
-                          <Button className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Create Post
-                          </Button>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </div>
+      <main id="main-content" className="flex-1 py-10 md:py-14">
+        <div className="container-editorial max-w-4xl animate-page-enter">
+          <header className="border-b border-border pb-10">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="meta-label mb-3">Author</p>
+                <h1 className="font-serif text-[clamp(2.2rem,4vw,3rem)] font-normal tracking-tight">
+                  {displayName}
+                </h1>
+                {displayEmail && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {displayEmail}
+                  </p>
+                )}
+                <p className="mt-4 font-mono text-xs tabular-nums text-muted-foreground">
+                  {totalPosts} {totalPosts === 1 ? "post" : "posts"}
+                </p>
               </div>
-            </Card>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">
-                {isOwnProfile ? "My Posts" : `${userInfo?.username}'s Posts`}
-              </h2>
-              <span className="text-muted-foreground">
-                {totalPosts} {totalPosts === 1 ? "post" : "posts"}
-              </span>
+              {isOwnProfile && (
+                <Link href="/blog/create">
+                  <Button className="gap-2">
+                    <Icon icon={Add01Icon} size={16} />
+                    Create post
+                  </Button>
+                </Link>
+              )}
             </div>
+          </header>
+
+          <section className="pt-10">
+            <h2 className="mb-6 font-serif text-2xl font-normal tracking-tight">
+              {isOwnProfile ? "Your posts" : "Posts"}
+            </h2>
 
             {totalPosts === 0 ? (
-              <Card className="p-12 text-center">
-                <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
+              <div className="border border-dashed border-border py-14 text-center">
+                <Icon
+                  icon={File01Icon}
+                  size={28}
+                  className="mx-auto mb-4 text-muted-foreground"
+                />
+                <p className="font-serif text-xl">
                   {isOwnProfile ? "No posts yet" : "No posts published"}
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  {isOwnProfile
-                    ? "Start sharing your thoughts with the community by creating your first post."
-                    : "This user hasn't published any posts yet."}
                 </p>
-              </Card>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {isOwnProfile
+                    ? "Draft your first piece when you are ready."
+                    : "This author has not published yet."}
+                </p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userPosts.map((post, index) => (
-                  <BlogCard key={post._id} post={post} index={index} />
+              <div>
+                {userPosts.map((post) => (
+                  <PostRow key={post._id} post={post} />
                 ))}
               </div>
             )}
-          </div>
+          </section>
         </div>
       </main>
 

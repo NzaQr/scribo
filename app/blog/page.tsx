@@ -2,93 +2,98 @@
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { BlogCard } from "@/components/blog/blog-card";
+import { PostRow } from "@/components/blog/blog-card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { usePosts } from "@/lib/hooks/use-blog";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 
 export default function BlogPage() {
   const { data: posts, isLoading, error } = usePosts();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredPosts = posts?.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (post.description?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      ) ||
-      post.tags.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-  );
+  const filteredPosts = useMemo(() => {
+    if (!posts) return [];
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return posts;
+    return posts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(q) ||
+        (post.description?.toLowerCase() || "").includes(q) ||
+        post.tags.some((tag) => tag.toLowerCase().includes(q))
+    );
+  }, [posts, searchTerm]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell">
       <Header />
 
-      <main className="flex-1">
-        <section className="py-16 px-4 bg-muted/30 flex justify-center">
-          <div className="container mx-auto max-w-4xl text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 fade-in">
+      <main id="main-content" className="flex-1">
+        <section className="border-b border-border">
+          <div className="container-editorial animate-page-enter py-14 md:py-16">
+            <h1 className="font-serif text-[clamp(2.4rem,5vw,3.5rem)] font-normal tracking-tight">
               Posts
             </h1>
-
-            <p className="text-xl text-muted-foreground mb-8 fade-in-delay-1">
-              Read all about software development, design and technology
+            <p className="mt-3 max-w-lg text-muted-foreground">
+              Essays and notes on software, design, and technology.
             </p>
 
-            <div className="max-w-md mx-auto flex gap-2 fade-in-delay-2">
+            <label className="relative mt-8 block max-w-md">
+              <span className="sr-only">Search posts</span>
+              <Icon
+                icon={Search01Icon}
+                size={16}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
               <Input
-                placeholder="Search posts..."
-                className="flex-1"
+                placeholder="Search titles, descriptions, tags..."
+                className="pl-9"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Button variant="secondary">Search</Button>
-            </div>
+            </label>
           </div>
         </section>
 
-        <section className="py-16 px-4 flex justify-center">
-          <div className="container mx-auto max-w-6xl">
-            {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Loading posts...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">Error loading posts</p>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredPosts?.map((post, index) => (
-                    <BlogCard key={post._id} post={post} index={index} />
-                  ))}
+        <section className="container-editorial py-10 md:py-14">
+          {isLoading ? (
+            <div className="space-y-0">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="space-y-3 border-b border-border py-6">
+                  <div className="h-3 w-28 animate-pulse rounded bg-muted" />
+                  <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
+                  <div className="h-4 w-full max-w-xl animate-pulse rounded bg-muted" />
                 </div>
-
-                {filteredPosts?.length === 0 && searchTerm && (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground">
-                      No results found for "{searchTerm}"
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex justify-center mt-12 gap-2 fade-in-delay-4">
-                  <Button variant="ghost" disabled>
-                    Previous
-                  </Button>
-                  <Button variant="primary">1</Button>
-                  <Button variant="ghost">2</Button>
-                  <Button variant="ghost">3</Button>
-                  <Button variant="ghost">Next</Button>
-                </div>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : error ? (
+            <p className="py-12 text-muted-foreground">
+              Could not load posts. Please try again.
+            </p>
+          ) : filteredPosts.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="font-serif text-2xl">
+                {searchTerm ? "No matches" : "Nothing published yet"}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {searchTerm
+                  ? `Nothing found for “${searchTerm}”.`
+                  : "When posts arrive, they will appear here as a reading list."}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="meta-label mb-4">
+                {filteredPosts.length}{" "}
+                {filteredPosts.length === 1 ? "post" : "posts"}
+                {searchTerm ? ` · filtered` : ""}
+              </p>
+              {filteredPosts.map((post) => (
+                <PostRow key={post._id} post={post} />
+              ))}
+            </div>
+          )}
         </section>
       </main>
 

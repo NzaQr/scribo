@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Eye, Edit3, Code, Link, Bold, Italic } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
+import { MarkdownRenderer } from "@/components/blog/markdown-renderer";
+import { cn } from "@/lib/utils";
+import {
+  CodeIcon,
+  Edit02Icon,
+  Heading02Icon,
+  LeftToRightListBulletIcon,
+  Link01Icon,
+  QuoteDownIcon,
+  SourceCodeIcon,
+  TextBoldIcon,
+  TextItalicIcon,
+  ViewIcon,
+} from "@hugeicons/core-free-icons";
 
 interface MarkdownEditorProps {
   value: string;
@@ -17,6 +27,34 @@ interface MarkdownEditorProps {
 
 type ViewMode = "edit" | "preview" | "split";
 
+interface ToolbarAction {
+  label: string;
+  before: string;
+  after?: string;
+  icon: typeof TextBoldIcon;
+}
+
+const toolbarActions: ToolbarAction[] = [
+  { label: "Bold", before: "**", after: "**", icon: TextBoldIcon },
+  { label: "Italic", before: "*", after: "*", icon: TextItalicIcon },
+  { label: "Link", before: "[", after: "](url)", icon: Link01Icon },
+  { label: "Inline code", before: "`", after: "`", icon: SourceCodeIcon },
+  {
+    label: "Code block",
+    before: "```ts\n",
+    after: "\n```",
+    icon: CodeIcon,
+  },
+  { label: "Quote", before: "> ", after: "", icon: QuoteDownIcon },
+  {
+    label: "List",
+    before: "- ",
+    after: "",
+    icon: LeftToRightListBulletIcon,
+  },
+  { label: "Heading", before: "## ", after: "", icon: Heading02Icon },
+];
+
 export function MarkdownEditor({
   value,
   onChange,
@@ -24,15 +62,10 @@ export function MarkdownEditor({
   className = "",
 }: MarkdownEditorProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("edit");
-
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
-  };
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const insertMarkdown = (before: string, after: string = "") => {
-    const textarea = document.getElementById(
-      "markdown-editor"
-    ) as HTMLTextAreaElement;
+    const textarea = textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -47,214 +80,114 @@ export function MarkdownEditor({
       value.substring(end);
     onChange(newText);
 
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       textarea.focus();
       textarea.setSelectionRange(
         start + before.length,
         start + before.length + selectedText.length
       );
-    }, 0);
+    });
   };
 
-  const markdownButtons = [
-    { label: "Bold", before: "**", after: "**", icon: <Bold /> },
-    { label: "Italic", before: "*", after: "*", icon: <Italic /> },
-    {
-      label: "Link",
-      before: "[",
-      after: "](url)",
-      icon: <Link />,
-    },
-    { label: "Code", before: "`", after: "`", icon: "<>" },
-    { label: "Code Block", before: "```\n", after: "\n```", icon: "```" },
-    { label: "Quote", before: "> ", after: "", icon: "❝" },
-    { label: "List", before: "- ", after: "", icon: "•" },
-    { label: "Header", before: "## ", after: "", icon: "H" },
-  ];
-
   return (
-    <div className={`space-y-4 ${className}`}>
-      <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/50 rounded-lg">
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant={viewMode === "edit" ? "primary" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("edit")}
-          >
-            <Edit3 className="w-4 h-4 mr-1" />
-            Edit
-          </Button>
-          <Button
-            type="button"
-            variant={viewMode === "preview" ? "primary" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("preview")}
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            Preview
-          </Button>
-          <Button
-            type="button"
-            variant={viewMode === "split" ? "primary" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("split")}
-          >
-            <Code className="w-4 h-4 mr-1" />
-            Split
-          </Button>
-        </div>
-
-        <div className="w-px h-6 bg-border mx-2" />
-
-        <div className="flex flex-wrap items-center gap-1">
-          {markdownButtons.map((button) => (
-            <Button
-              key={button.label}
+    <div className={cn("space-y-3", className)}>
+      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
+        <div
+          className="inline-flex rounded-md border border-border bg-paper p-0.5"
+          role="tablist"
+          aria-label="Editor mode"
+        >
+          {(
+            [
+              { mode: "edit", label: "Edit", icon: Edit02Icon },
+              { mode: "preview", label: "Preview", icon: ViewIcon },
+              { mode: "split", label: "Split", icon: CodeIcon },
+            ] as const
+          ).map(({ mode, label, icon }) => (
+            <button
+              key={mode}
               type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertMarkdown(button.before, button.after)}
-              title={button.label}
-              className="h-16 w-16 p-0"
+              role="tab"
+              aria-selected={viewMode === mode}
+              onClick={() => setViewMode(mode)}
+              className={cn(
+                "inline-flex h-8 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium leading-none transition-colors",
+                viewMode === mode
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
             >
-              {button.icon}
-            </Button>
+              <Icon icon={icon} size={14} />
+              {label}
+            </button>
           ))}
         </div>
+
+        {(viewMode === "edit" || viewMode === "split") && (
+          <>
+            <div className="mx-1 hidden h-5 w-px bg-border sm:block" />
+            <div className="flex flex-wrap items-center gap-0.5">
+              {toolbarActions.map((action) => (
+                <Button
+                  key={action.label}
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    insertMarkdown(action.before, action.after || "")
+                  }
+                  title={action.label}
+                  aria-label={action.label}
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                >
+                  <Icon icon={action.icon} size={15} />
+                </Button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div
-        className="grid gap-4"
-        style={{
-          gridTemplateColumns: viewMode === "split" ? "1fr 1fr" : "1fr",
-        }}
+        className={cn(
+          "grid gap-4",
+          viewMode === "split" && "lg:grid-cols-2"
+        )}
       >
         {(viewMode === "edit" || viewMode === "split") && (
-          <Card className="p-0 overflow-hidden">
+          <div className="overflow-hidden rounded-md border border-border bg-paper">
             <textarea
+              ref={textareaRef}
               id="markdown-editor"
               value={value}
-              onChange={handleTextareaChange}
+              onChange={(e) => onChange(e.target.value)}
               placeholder={placeholder}
-              className="w-full h-96 p-4 border-0 resize-none focus:outline-none bg-transparent font-mono text-sm leading-relaxed"
-              style={{ minHeight: "400px" }}
+              className="min-h-[28rem] w-full resize-y bg-transparent p-4 font-mono text-base leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none"
+              spellCheck
             />
-          </Card>
+          </div>
         )}
 
         {(viewMode === "preview" || viewMode === "split") && (
-          <Card className="p-4 overflow-auto">
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              {value ? (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight]}
-                  components={{
-                    code: ({ className, children, ...props }: any) => {
-                      const match = /language-(\w+)/.exec(className || "");
-                      const isInline = !match;
-                      return !isInline ? (
-                        <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
-                        </pre>
-                      ) : (
-                        <code
-                          className="bg-muted px-1 py-0.5 rounded text-sm"
-                          {...props}
-                        >
-                          {children}
-                        </code>
-                      );
-                    },
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground">
-                        {children}
-                      </blockquote>
-                    ),
-                    h1: ({ children }) => (
-                      <h1 className="text-2xl font-bold mb-4 text-foreground">
-                        {children}
-                      </h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className="text-xl font-semibold mb-3 text-foreground">
-                        {children}
-                      </h2>
-                    ),
-                    h3: ({ children }) => (
-                      <h3 className="text-lg font-medium mb-2 text-foreground">
-                        {children}
-                      </h3>
-                    ),
-                    p: ({ children }) => (
-                      <p className="mb-4 leading-relaxed text-foreground">
-                        {children}
-                      </p>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="list-disc list-inside mb-4 space-y-1">
-                        {children}
-                      </ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal list-inside mb-4 space-y-1">
-                        {children}
-                      </ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="text-foreground">{children}</li>
-                    ),
-                    a: ({ children, href }) => (
-                      <a
-                        href={href}
-                        className="text-primary hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {children}
-                      </a>
-                    ),
-                    table: ({ children }) => (
-                      <div className="overflow-x-auto mb-4">
-                        <table className="min-w-full border border-border rounded-lg">
-                          {children}
-                        </table>
-                      </div>
-                    ),
-                    th: ({ children }) => (
-                      <th className="border border-border px-4 py-2 bg-muted font-semibold text-left">
-                        {children}
-                      </th>
-                    ),
-                    td: ({ children }) => (
-                      <td className="border border-border px-4 py-2">
-                        {children}
-                      </td>
-                    ),
-                  }}
-                >
-                  {value}
-                </ReactMarkdown>
-              ) : (
-                <div className="text-muted-foreground italic">
-                  {placeholder}
-                </div>
-              )}
-            </div>
-          </Card>
+          <div
+            key={viewMode}
+            className="min-h-[28rem] overflow-auto rounded-md border border-border bg-paper p-4 sm:p-6"
+          >
+            {value ? (
+              <MarkdownRenderer content={value} />
+            ) : (
+              <p className="text-sm italic text-muted-foreground">
+                {placeholder}
+              </p>
+            )}
+          </div>
         )}
       </div>
 
-      <div className="text-xs text-muted-foreground">
-        <p>
-          <strong>Markdown Tips:</strong> Use **text** for bold, *text* for
-          italic, [link](url) for links, `code` for inline code, and ``` for
-          code blocks.
-        </p>
-      </div>
+      <p className="text-xs text-muted-foreground">
+        Markdown supported: headings, lists, tables, task lists, fenced code,
+        images, and links.
+      </p>
     </div>
   );
 }

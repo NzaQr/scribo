@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface TagsInputProps {
   id: string;
@@ -10,32 +11,34 @@ interface TagsInputProps {
 export function TagsInput({ id, value, onChange }: TagsInputProps) {
   const [tagInput, setTagInput] = useState("");
 
+  const commitTags = (raw: string) => {
+    const tagsArray = raw
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+    const newTags = tagsArray.filter((tag) => !value.includes(tag));
+    if (newTags.length > 0) {
+      onChange([...value, ...newTags]);
+    }
+  };
+
   return (
     <div>
-      <label htmlFor="tags" className="block text-sm font-medium mb-2">
+      <label htmlFor={id} className="mb-2 block text-sm font-medium">
         Tags
       </label>
       <div className="space-y-3">
         <Input
           id={id}
           type="text"
-          placeholder="Enter tags separated by commas..."
+          placeholder="Add a tag, then press Enter or comma"
           value={tagInput}
           onChange={(e) => {
             const inputValue = e.target.value;
             setTagInput(inputValue);
 
             if (inputValue.includes(",")) {
-              const tagsArray = inputValue
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter((tag) => tag.length > 0);
-
-              const newTags = tagsArray.filter((tag) => !value.includes(tag));
-              if (newTags.length > 0) {
-                onChange([...value, ...newTags]);
-              }
-
+              commitTags(inputValue);
               setTagInput("");
             }
           }}
@@ -51,26 +54,26 @@ export function TagsInput({ id, value, onChange }: TagsInputProps) {
           }}
         />
         {value.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {value.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+          <ul className="flex flex-wrap gap-2">
+            {value.map((tag) => (
+              <li
+                key={tag}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-sm border border-border bg-muted px-2 py-1 font-mono text-xs text-foreground"
+                )}
               >
                 {tag}
                 <button
                   type="button"
-                  onClick={() => {
-                    const newTags = value.filter((_, i) => i !== index);
-                    onChange(newTags);
-                  }}
-                  className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-primary/20 transition-colors"
+                  onClick={() => onChange(value.filter((t) => t !== tag))}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label={`Remove ${tag}`}
                 >
                   ×
                 </button>
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </div>
