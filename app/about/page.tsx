@@ -2,64 +2,68 @@
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+
+const topics = [
+  "React, Next.js and TypeScript in production",
+  "Design systems and interface details",
+  "Performance and accessibility",
+  "Tools and workflow, from the people who use them",
+];
 
 export default function AboutPage() {
   return (
     <div className="page-shell">
       <Header />
 
-      <main id="main-content" className="flex-1">
-        <section className="border-b border-border">
-          <div className="container-editorial animate-page-enter max-w-3xl py-16 md:py-20">
-            <p className="brand-mark mb-6 text-[clamp(2.5rem,6vw,4rem)] leading-none">
-              Scribo
-            </p>
-            <h1 className="sr-only">About Scribo</h1>
-            <p className="max-w-xl font-serif text-[clamp(1.35rem,2.2vw,1.75rem)] leading-snug text-foreground">
-              A community publication for builders who care about how software
-              feels, reads, and lasts.
-            </p>
-          </div>
+      <main id="main-content" className="flex-1 pb-24">
+        <section className="container-editorial animate-page-enter pb-14 pt-20 md:pt-24">
+          <h1 className="max-w-[18ch] text-[clamp(2.5rem,1.6rem+3.2vw,4.25rem)] leading-[1.04] tracking-[-0.035em]">
+            About Scribo.{" "}
+            <span className="text-quiet-foreground">
+              A community publication for people who build for the web.
+            </span>
+          </h1>
         </section>
 
-        <section className="container-editorial max-w-3xl py-14 md:py-16">
-          <div className="space-y-6 text-base leading-relaxed text-muted-foreground measure">
+        <section className="container-editorial flex flex-wrap gap-x-16 gap-y-12 border-t border-border pt-14">
+          <div className="min-w-0 flex-[2_1_28rem] space-y-6 font-serif text-[1.1875rem] leading-[1.72] text-reading">
             <p>
-              Scribo is a place to publish careful writing about web
-              development, design systems, and the craft of shipping product.
-              Posts are meant to be read like essays, not scanned like a feed.
+              Scribo is a place to publish long posts about web development,
+              design systems and how teams ship products. You write in
+              Markdown, and readers see the same layout that you see in the
+              preview.
             </p>
             <p>
-              We keep the surface quiet on purpose: strong typography, honest
-              metadata, Markdown that looks the same while you draft and after
-              you publish. The goal is fewer distractions between an idea and a
-              reader.
+              The interface stays quiet: clear type, dates and read time, and
+              comments under each post. You read one post at a time, with no
+              feed to scroll.
             </p>
           </div>
 
-          <div className="mt-14 border-t border-border pt-10">
-            <h2 className="font-serif text-2xl font-normal tracking-tight">
-              What you will find here
+          <div className="min-w-0 flex-[1_1_18rem]">
+            <h2 className="text-[1.375rem] leading-tight">
+              Topics on Scribo
             </h2>
-            <ul className="mt-6 space-y-3 text-muted-foreground">
-              <li className="border-b border-border pb-3">
-                Practical notes on React, Next.js, and TypeScript
-              </li>
-              <li className="border-b border-border pb-3">
-                Design systems, interface craft, and reading experiences
-              </li>
-              <li className="border-b border-border pb-3">
-                Performance, accessibility, and durable product decisions
-              </li>
-              <li>Community voices on tools and trends that matter</li>
+            <ul className="mt-5 rounded-lg border border-border bg-paper px-6 py-1">
+              {topics.map((topic) => (
+                <li
+                  key={topic}
+                  className="border-b border-border py-4 text-[0.9375rem] last:border-b-0"
+                >
+                  {topic}
+                </li>
+              ))}
             </ul>
-          </div>
-
-          <div className="mt-14">
-            <Link href="/blog">
-              <Button size="lg">Browse the posts</Button>
+            <Link
+              href="/blog"
+              className={buttonVariants({ size: "lg", className: "mt-8" })}
+            >
+              Browse the posts
+              <Icon icon={ArrowRight02Icon} size={16} />
             </Link>
           </div>
         </section>

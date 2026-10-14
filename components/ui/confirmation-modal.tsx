@@ -66,19 +66,19 @@ export function ConfirmationModal({
       aria-modal="true"
       aria-labelledby="confirm-title"
     >
-      <div className="absolute inset-0 bg-foreground/40" />
+      <div className="absolute inset-0 bg-foreground/30 backdrop-blur-[2px]" />
 
-      <div className="relative mx-4 w-full max-w-md rounded-md border border-border bg-paper-elevated p-6 shadow-[var(--shadow-md)]">
+      <div className="relative mx-4 w-full max-w-md rounded-xl border border-border bg-paper-elevated p-6 shadow-[var(--shadow-md)]">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             {variant === "secondary" && (
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-danger-muted text-danger">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-muted text-danger">
                 <Icon icon={Alert02Icon} size={18} />
               </div>
             )}
             <h3
               id="confirm-title"
-              className="font-serif text-xl font-normal text-foreground"
+              className="text-lg text-foreground"
             >
               {title}
             </h3>

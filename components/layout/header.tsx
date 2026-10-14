@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Icon } from "@/components/ui/icon";
+import { Avatar } from "@/components/ui/avatar";
 import { useAuthStore } from "@/stores/auth-store";
 import {
   DropdownMenu,
@@ -19,7 +20,7 @@ import {
   Login03Icon,
   Logout01Icon,
   Menu02Icon,
-  UserIcon,
+  PencilEdit02Icon,
   UserAdd01Icon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
@@ -34,22 +35,34 @@ function isActivePath(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
+export function Brand({ className }: { className?: string }) {
+  return (
+    <Link
+      href="/"
+      className={cn(
+        "inline-flex items-center gap-2.5 transition-opacity hover:opacity-75",
+        className
+      )}
+    >
+      <span className="brand-mark" aria-hidden="true">
+        S
+      </span>
+      <span className="brand-name">Scribo</span>
+    </Link>
+  );
+}
+
 export function Header() {
   const { user, isAuthenticated, logout, isLoading } = useAuthStore();
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/80 backdrop-blur-md">
-      <div className="container-editorial relative flex h-14 items-center justify-between md:h-16">
-        <Link
-          href="/"
-          className="brand-mark relative z-10 text-[1.5rem] transition-opacity hover:opacity-70 md:text-[1.65rem]"
-        >
-          Scribo
-        </Link>
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-md">
+      <div className="container-editorial relative flex h-16 items-center justify-between gap-4">
+        <Brand className="relative z-10" />
 
         <nav
-          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-7 md:flex"
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 md:flex"
           aria-label="Primary"
         >
           {navItems.map((item) => {
@@ -58,106 +71,99 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative text-[0.9375rem] tracking-[-0.01em] transition-colors",
+                  "rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "text-foreground"
+                    ? "bg-muted text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {item.label}
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute -bottom-1 left-0 h-px w-full origin-left bg-foreground transition-transform duration-200 ease-[cubic-bezier(0.2,0,0,1)]",
-                    active ? "scale-x-100" : "scale-x-0"
-                  )}
-                />
               </Link>
             );
           })}
         </nav>
 
-        <div className="relative z-10 flex items-center gap-0.5">
-          <div className="hidden items-center gap-1 md:flex">
+        <div className="relative z-10 flex items-center gap-2">
+          <ThemeToggle />
+
+          <div className="hidden items-center gap-2 md:flex">
             {isLoading ? (
-              <div className="h-8 w-24 animate-pulse rounded-md bg-muted" />
+              <div className="h-10 w-32 animate-pulse rounded-full bg-muted" />
             ) : isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-2 text-muted-foreground hover:text-foreground"
-                  >
-                    <Icon icon={UserIcon} size={15} />
-                    <span className="max-w-[9rem] truncate">
-                      {user?.username}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-2 py-2">
-                    <p className="text-sm font-medium">{user?.username}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href={`/profile/${user?.id}`}
-                      className="cursor-pointer"
+              <>
+                <Link
+                  href="/blog/create"
+                  className={buttonVariants({ size: "sm", className: "h-10" })}
+                >
+                  <Icon icon={PencilEdit02Icon} size={16} />
+                  Write
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Account menu"
+                      className="rounded-full transition-opacity hover:opacity-80"
                     >
-                      <Icon icon={File01Icon} size={16} className="mr-2" />
-                      My Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/blog/create" className="cursor-pointer">
-                      <Icon icon={Add01Icon} size={16} className="mr-2" />
-                      Create Post
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={logout}
-                    className="cursor-pointer"
-                  >
-                    <Icon icon={Logout01Icon} size={16} className="mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <Avatar name={user?.username} size="lg" tone="accent" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-2.5 py-2">
+                      <p className="text-sm font-medium">{user?.username}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href={`/profile/${user?.id}`}>
+                        <Icon icon={File01Icon} size={16} className="mr-2" />
+                        My profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout}>
+                      <Icon icon={Logout01Icon} size={16} className="mr-2" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <>
-                <Link href="/auth/login">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Log In
-                  </Button>
+                <Link
+                  href="/auth/login"
+                  className={buttonVariants({
+                    variant: "ghost",
+                    size: "sm",
+                    className: "h-10",
+                  })}
+                >
+                  Sign in
                 </Link>
-                <Link href="/auth/register">
-                  <Button size="sm">Register</Button>
+                <Link
+                  href="/blog/create"
+                  className={buttonVariants({ size: "sm", className: "h-10" })}
+                >
+                  <Icon icon={PencilEdit02Icon} size={16} />
+                  Write
                 </Link>
               </>
             )}
           </div>
 
-          <ThemeToggle />
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="text-muted-foreground hover:text-foreground md:hidden"
+                className="border-border md:hidden"
                 aria-label="Open menu"
               >
-                <Icon icon={Menu02Icon} size={20} />
+                <Icon icon={Menu02Icon} size={18} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 md:hidden">
@@ -167,10 +173,7 @@ export function Header() {
                   <DropdownMenuItem key={item.href} asChild>
                     <Link
                       href={item.href}
-                      className={cn(
-                        "cursor-pointer",
-                        active && "bg-muted font-medium text-foreground"
-                      )}
+                      className={cn(active && "bg-muted font-medium")}
                     >
                       {item.label}
                     </Link>
@@ -180,52 +183,46 @@ export function Header() {
               <DropdownMenuSeparator />
               {isLoading ? (
                 <div className="px-2 py-2">
-                  <div className="h-8 animate-pulse rounded-md bg-muted" />
+                  <div className="h-8 animate-pulse rounded-lg bg-muted" />
                 </div>
               ) : isAuthenticated ? (
                 <>
-                  <div className="px-2 py-2">
+                  <div className="px-2.5 py-2">
                     <p className="text-sm font-medium">{user?.username}</p>
                     <p className="truncate text-xs text-muted-foreground">
                       {user?.email}
                     </p>
                   </div>
                   <DropdownMenuItem asChild>
-                    <Link
-                      href={`/profile/${user?.id}`}
-                      className="cursor-pointer"
-                    >
-                      <Icon icon={File01Icon} size={16} className="mr-2" />
-                      My Profile
+                    <Link href="/blog/create">
+                      <Icon icon={Add01Icon} size={16} className="mr-2" />
+                      Write a post
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/blog/create" className="cursor-pointer">
-                      <Icon icon={Add01Icon} size={16} className="mr-2" />
-                      Create Post
+                    <Link href={`/profile/${user?.id}`}>
+                      <Icon icon={File01Icon} size={16} className="mr-2" />
+                      My profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={logout}
-                    className="cursor-pointer"
-                  >
+                  <DropdownMenuItem onClick={logout}>
                     <Icon icon={Logout01Icon} size={16} className="mr-2" />
-                    Logout
+                    Sign out
                   </DropdownMenuItem>
                 </>
               ) : (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link href="/auth/login" className="cursor-pointer">
+                    <Link href="/auth/login">
                       <Icon icon={Login03Icon} size={16} className="mr-2" />
-                      Log In
+                      Sign in
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/auth/register" className="cursor-pointer">
+                    <Link href="/auth/register">
                       <Icon icon={UserAdd01Icon} size={16} className="mr-2" />
-                      Register
+                      Create an account
                     </Link>
                   </DropdownMenuItem>
                 </>

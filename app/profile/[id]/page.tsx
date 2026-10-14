@@ -3,13 +3,15 @@
 import { useParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
 import { Icon } from "@/components/ui/icon";
 import { useUserPosts } from "@/lib/hooks/use-blog";
 import { useAuthStore } from "@/stores/auth-store";
-import { PostRow } from "@/components/blog/blog-card";
-import { Add01Icon, File01Icon } from "@hugeicons/core-free-icons";
+import { PostCard } from "@/components/blog/blog-card";
+import { PencilEdit02Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+import ProfileLoading from "./loading";
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -20,19 +22,7 @@ export default function UserProfilePage() {
   const isOwnProfile = currentUser?.id === userId;
 
   if (isLoading) {
-    return (
-      <div className="page-shell">
-        <Header />
-        <main className="flex-1 py-12">
-          <div className="container-editorial max-w-4xl space-y-4">
-            <div className="h-10 w-56 animate-pulse rounded bg-muted" />
-            <div className="h-4 w-40 animate-pulse rounded bg-muted" />
-            <div className="mt-10 h-32 w-full animate-pulse rounded bg-muted" />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <ProfileLoading />;
   }
 
   if (error || !userPosts) {
@@ -41,12 +31,12 @@ export default function UserProfilePage() {
         <Header />
         <main className="flex-1 py-20">
           <div className="container-editorial max-w-4xl text-center">
-            <h1 className="font-serif text-3xl">Profile not found</h1>
+            <h1 className="text-3xl">Profile not found</h1>
             <p className="mt-3 text-muted-foreground">
-              This author profile does not exist.
+              No author has this profile link.
             </p>
-            <Link href="/blog" className="mt-8 inline-block">
-              <Button>Back to posts</Button>
+            <Link href="/blog" className={buttonVariants({ className: "mt-8" })}>
+              Back to posts
             </Link>
           </div>
         </main>
@@ -66,60 +56,54 @@ export default function UserProfilePage() {
     <div className="page-shell">
       <Header />
 
-      <main id="main-content" className="flex-1 py-10 md:py-14">
-        <div className="container-editorial max-w-4xl animate-page-enter">
-          <header className="border-b border-border pb-10">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <main id="main-content" className="flex-1 pb-24 pt-14 md:pt-20">
+        <div className="container-editorial animate-page-enter">
+          <header className="flex flex-wrap items-end justify-between gap-6 border-b border-border pb-10">
+            <div className="flex items-center gap-5">
+              <Avatar
+                name={displayName}
+                size="xl"
+                tone="accent"
+                className="size-16 text-lg"
+              />
               <div>
-                <p className="meta-label mb-3">Author</p>
-                <h1 className="font-serif text-[clamp(2.2rem,4vw,3rem)] font-normal tracking-tight">
+                <h1 className="text-[clamp(2rem,1.6rem+1.6vw,2.75rem)] leading-[1.1] tracking-[-0.03em]">
                   {displayName}
                 </h1>
-                {displayEmail && (
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {displayEmail}
-                  </p>
-                )}
-                <p className="mt-4 font-mono text-xs tabular-nums text-muted-foreground">
-                  {totalPosts} {totalPosts === 1 ? "post" : "posts"}
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  {displayEmail ? `${displayEmail} · ` : ""}
+                  <span className="tabular-nums">
+                    {totalPosts} {totalPosts === 1 ? "post" : "posts"}
+                  </span>
                 </p>
               </div>
-              {isOwnProfile && (
-                <Link href="/blog/create">
-                  <Button className="gap-2">
-                    <Icon icon={Add01Icon} size={16} />
-                    Create post
-                  </Button>
-                </Link>
-              )}
             </div>
+            {isOwnProfile && (
+              <Link href="/blog/create" className={buttonVariants()}>
+                <Icon icon={PencilEdit02Icon} size={16} />
+                Write a post
+              </Link>
+            )}
           </header>
 
-          <section className="pt-10">
-            <h2 className="mb-6 font-serif text-2xl font-normal tracking-tight">
+          <section className="pt-12">
+            <h2 className="mb-6 text-[1.375rem] leading-tight">
               {isOwnProfile ? "Your posts" : "Posts"}
             </h2>
 
             {totalPosts === 0 ? (
-              <div className="border border-dashed border-border py-14 text-center">
-                <Icon
-                  icon={File01Icon}
-                  size={28}
-                  className="mx-auto mb-4 text-muted-foreground"
-                />
-                <p className="font-serif text-xl">
-                  {isOwnProfile ? "No posts yet" : "No posts published"}
-                </p>
+              <div className="rounded-lg border border-dashed border-border-strong px-6 py-14 text-center">
+                <p className="text-lg font-medium">No posts yet</p>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {isOwnProfile
-                    ? "Draft your first piece when you are ready."
-                    : "This author has not published yet."}
+                    ? "Write your first post when you are ready."
+                    : "This author has not published a post."}
                 </p>
               </div>
             ) : (
-              <div>
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-5">
                 {userPosts.map((post) => (
-                  <PostRow key={post._id} post={post} />
+                  <PostCard key={post._id} post={post} />
                 ))}
               </div>
             )}

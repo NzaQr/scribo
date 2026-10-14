@@ -2,16 +2,18 @@
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { PostRow } from "@/components/blog/blog-card";
+import { PostCard } from "@/components/blog/blog-card";
 import { Input } from "@/components/ui/input";
 import { Icon } from "@/components/ui/icon";
 import { usePosts } from "@/lib/hooks/use-blog";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search01Icon } from "@hugeicons/core-free-icons";
 
-export default function BlogPage() {
+function BlogList() {
   const { data: posts, isLoading, error } = usePosts();
-  const [searchTerm, setSearchTerm] = useState("");
+  const searchParams = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("q") ?? "");
 
   const filteredPosts = useMemo(() => {
     if (!posts) return [];
@@ -26,77 +28,89 @@ export default function BlogPage() {
   }, [posts, searchTerm]);
 
   return (
-    <div className="page-shell">
-      <Header />
-
-      <main id="main-content" className="flex-1">
-        <section className="border-b border-border">
-          <div className="container-editorial animate-page-enter py-14 md:py-16">
-            <h1 className="font-serif text-[clamp(2.4rem,5vw,3.5rem)] font-normal tracking-tight">
-              Posts
+    <>
+      <section className="container-editorial animate-page-enter pb-10 pt-16 md:pt-20">
+        <div className="flex flex-wrap items-end justify-between gap-8">
+          <div>
+            <h1 className="text-[clamp(2.25rem,1.6rem+2.4vw,3.5rem)] leading-[1.05] tracking-[-0.035em]">
+              All posts
             </h1>
             <p className="mt-3 max-w-lg text-muted-foreground">
-              Essays and notes on software, design, and technology.
+              Notes on software, design and the web, newest first.
             </p>
-
-            <label className="relative mt-8 block max-w-md">
-              <span className="sr-only">Search posts</span>
-              <Icon
-                icon={Search01Icon}
-                size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              />
-              <Input
-                placeholder="Search titles, descriptions, tags..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </label>
           </div>
-        </section>
 
-        <section className="container-editorial py-10 md:py-14">
-          {isLoading ? (
-            <div className="space-y-0">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="space-y-3 border-b border-border py-6">
-                  <div className="h-3 w-28 animate-pulse rounded bg-muted" />
-                  <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-full max-w-xl animate-pulse rounded bg-muted" />
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <p className="py-12 text-muted-foreground">
-              Could not load posts. Please try again.
+          <label className="relative block w-full max-w-sm">
+            <span className="sr-only">Search posts</span>
+            <Icon
+              icon={Search01Icon}
+              size={16}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              type="search"
+              placeholder="Search titles, summaries and tags"
+              className="rounded-full pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </label>
+        </div>
+      </section>
+
+      <section className="container-editorial pb-24">
+        {isLoading ? (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-5">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="h-64 animate-pulse rounded-lg border border-border bg-paper"
+              />
+            ))}
+          </div>
+        ) : error ? (
+          <p className="py-12 text-muted-foreground">
+            We could not load posts. Try again in a moment.
+          </p>
+        ) : filteredPosts.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border-strong px-6 py-16 text-center">
+            <p className="text-lg font-medium">
+              {searchTerm ? "No matches" : "No posts yet"}
             </p>
-          ) : filteredPosts.length === 0 ? (
-            <div className="py-16 text-center">
-              <p className="font-serif text-2xl">
-                {searchTerm ? "No matches" : "Nothing published yet"}
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {searchTerm
-                  ? `Nothing found for “${searchTerm}”.`
-                  : "When posts arrive, they will appear here as a reading list."}
-              </p>
-            </div>
-          ) : (
-            <div>
-              <p className="meta-label mb-4">
-                {filteredPosts.length}{" "}
-                {filteredPosts.length === 1 ? "post" : "posts"}
-                {searchTerm ? ` · filtered` : ""}
-              </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {searchTerm
+                ? `No post matches “${searchTerm}”.`
+                : "Write the first one."}
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className="meta-label mb-5" aria-live="polite">
+              {filteredPosts.length}{" "}
+              {filteredPosts.length === 1 ? "post" : "posts"}
+              {searchTerm ? ` for “${searchTerm.trim()}”` : ""}
+            </p>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-5">
               {filteredPosts.map((post) => (
-                <PostRow key={post._id} post={post} />
+                <PostCard key={post._id} post={post} />
               ))}
             </div>
-          )}
-        </section>
-      </main>
+          </>
+        )}
+      </section>
+    </>
+  );
+}
 
+export default function BlogPage() {
+  return (
+    <div className="page-shell">
+      <Header />
+      <main id="main-content" className="flex-1">
+        <Suspense fallback={null}>
+          <BlogList />
+        </Suspense>
+      </main>
       <Footer />
     </div>
   );

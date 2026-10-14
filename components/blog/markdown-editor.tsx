@@ -89,19 +89,23 @@ export function MarkdownEditor({
     });
   };
 
+  const words = value.trim() ? value.trim().split(/\s+/).length : 0;
+  const minutes = Math.max(1, Math.round(words / 200));
+  const showEditor = viewMode === "edit" || viewMode === "split";
+
   return (
     <div className={cn("space-y-3", className)}>
-      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div
-          className="inline-flex rounded-md border border-border bg-paper p-0.5"
+          className="inline-flex rounded-full bg-muted p-[3px]"
           role="tablist"
-          aria-label="Editor mode"
+          aria-label="Editor view"
         >
           {(
             [
-              { mode: "edit", label: "Edit", icon: Edit02Icon },
-              { mode: "preview", label: "Preview", icon: ViewIcon },
+              { mode: "edit", label: "Write", icon: Edit02Icon },
               { mode: "split", label: "Split", icon: CodeIcon },
+              { mode: "preview", label: "Preview", icon: ViewIcon },
             ] as const
           ).map(({ mode, label, icon }) => (
             <button
@@ -111,9 +115,9 @@ export function MarkdownEditor({
               aria-selected={viewMode === mode}
               onClick={() => setViewMode(mode)}
               className={cn(
-                "inline-flex h-8 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium leading-none transition-colors",
+                "inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[0.8125rem] font-medium leading-none transition-colors",
                 viewMode === mode
-                  ? "bg-foreground text-background"
+                  ? "bg-paper text-foreground shadow-[var(--shadow-sm)]"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -122,11 +126,21 @@ export function MarkdownEditor({
             </button>
           ))}
         </div>
+        <p className="meta-label">
+          {words} {words === 1 ? "word" : "words"} · {minutes} min read
+        </p>
+      </div>
 
-        {(viewMode === "edit" || viewMode === "split") && (
-          <>
-            <div className="mx-1 hidden h-5 w-px bg-border sm:block" />
-            <div className="flex flex-wrap items-center gap-0.5">
+      <div
+        className={cn("grid gap-4", viewMode === "split" && "lg:grid-cols-2")}
+      >
+        {showEditor && (
+          <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-paper transition-[border-color,box-shadow] focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--accent-wash)]">
+            <div
+              role="toolbar"
+              aria-label="Formatting"
+              className="flex flex-wrap items-center gap-0.5 border-b border-border px-2 py-1.5"
+            >
               {toolbarActions.map((action) => (
                 <Button
                   key={action.label}
@@ -138,55 +152,45 @@ export function MarkdownEditor({
                   }
                   title={action.label}
                   aria-label={action.label}
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground"
                 >
-                  <Icon icon={action.icon} size={15} />
+                  <Icon icon={action.icon} size={16} />
                 </Button>
               ))}
+              <span className="meta-label ml-auto pr-2">Markdown</span>
             </div>
-          </>
-        )}
-      </div>
-
-      <div
-        className={cn(
-          "grid gap-4",
-          viewMode === "split" && "lg:grid-cols-2"
-        )}
-      >
-        {(viewMode === "edit" || viewMode === "split") && (
-          <div className="overflow-hidden rounded-md border border-border bg-paper">
             <textarea
               ref={textareaRef}
               id="markdown-editor"
               value={value}
               onChange={(e) => onChange(e.target.value)}
               placeholder={placeholder}
-              className="min-h-[28rem] w-full resize-y bg-transparent p-4 font-mono text-base leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none"
+              className="min-h-[28rem] w-full flex-1 resize-y bg-transparent px-5 py-5 font-mono text-sm leading-[1.75] text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:outline-none"
               spellCheck
             />
           </div>
         )}
 
         {(viewMode === "preview" || viewMode === "split") && (
-          <div
+          <section
             key={viewMode}
-            className="min-h-[28rem] overflow-auto rounded-md border border-border bg-paper p-4 sm:p-6"
+            aria-label="Preview"
+            className="min-h-[28rem] overflow-auto rounded-lg border border-border bg-paper p-[clamp(1.5rem,3vw,3rem)]"
           >
             {value ? (
               <MarkdownRenderer content={value} />
             ) : (
-              <p className="text-sm italic text-muted-foreground">
-                {placeholder}
+              <p className="text-sm text-muted-foreground">
+                The preview shows here when you start to write.
               </p>
             )}
-          </div>
+          </section>
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Markdown supported: headings, lists, tables, task lists, fenced code,
-        images, and links.
+      <p className="text-[0.8125rem] text-muted-foreground">
+        You can use headings, lists, tables, task lists, code blocks, images
+        and links.
       </p>
     </div>
   );

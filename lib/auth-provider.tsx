@@ -4,27 +4,22 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import { setAuthStoreReference } from "@/lib/api/client";
 
+// The API client reads the token from the store. Set the reference before
+// any component sends a request.
+setAuthStoreReference(useAuthStore);
+
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const authStore = useAuthStore();
-  const { verifyAuth, isLoading } = authStore;
+  const verifyAuth = useAuthStore((state) => state.verifyAuth);
 
   useEffect(() => {
-    setAuthStoreReference(useAuthStore);
-
     verifyAuth();
   }, [verifyAuth]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-      </div>
-    );
-  }
-
+  // Do not block the page while auth loads. Components that depend on auth
+  // read `isLoading` and show their own placeholder.
   return <>{children}</>;
 }

@@ -3,6 +3,7 @@
 import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { Avatar } from "../ui/avatar";
 import { Input } from "../ui/input";
 import { useDeleteComment, useUpdateComment } from "@/lib/hooks/use-comments";
 import { useAuthStore } from "@/stores/auth-store";
@@ -52,97 +53,101 @@ export function Comment({ comment, postId }: CommentProps) {
   };
 
   return (
-    <div className="border-b border-border py-5 last:border-b-0">
-      <div className="mb-2 flex items-start justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
-          <Link
-            href={`/profile/${comment.user}`}
-            className="font-medium text-foreground transition-colors hover:text-accent"
-          >
-            {comment.username}
-          </Link>
-          {comment.createdAt && (
-            <time dateTime={new Date(comment.createdAt).toISOString()}>
-              {new Date(comment.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </time>
+    <div className="flex gap-3.5 border-b border-border py-6 last:border-b-0">
+      <Avatar name={comment.username} size="md" className="mt-0.5" />
+      <div className="min-w-0 flex-1">
+        <div className="mb-1.5 flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            <Link
+              href={`/profile/${comment.user}`}
+              className="font-medium text-foreground transition-colors hover:text-accent"
+            >
+              {comment.username}
+            </Link>
+            {comment.createdAt && (
+              <time dateTime={new Date(comment.createdAt).toISOString()}>
+                <span aria-hidden="true">· </span>
+                {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </time>
+            )}
+          </div>
+          {comment.user === user?.id && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="-mt-2 h-9 w-9 text-muted-foreground"
+                  aria-label="Comment options"
+                >
+                  <Icon icon={MoreVerticalIcon} size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setIsEditing(true);
+                    setEditText(comment.comment);
+                  }}
+                >
+                  <Icon icon={PencilEdit02Icon} size={16} className="mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    deleteComment({ postId, commentId: comment._id })
+                  }
+                  className="text-danger focus:text-danger"
+                >
+                  <Icon icon={Delete02Icon} size={16} className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
-        {comment.user === user?.id && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        {isEditing ? (
+          <div className="space-y-2">
+            <Input
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              placeholder="Edit your comment..."
+              autoFocus
+            />
+            <div className="flex gap-2">
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                aria-label="Comment options"
+                size="sm"
+                onClick={handleSave}
+                disabled={!editText.trim() || editText === comment.comment}
+                className="gap-1"
               >
-                <Icon icon={MoreVerticalIcon} size={16} />
+                <Icon icon={Tick02Icon} size={14} />
+                Save
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuItem
+              <Button
+                size="sm"
+                variant="ghost"
                 onClick={() => {
-                  setIsEditing(true);
                   setEditText(comment.comment);
+                  setIsEditing(false);
                 }}
+                className="gap-1"
               >
-                <Icon icon={PencilEdit02Icon} size={16} className="mr-2" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  deleteComment({ postId, commentId: comment._id })
-                }
-                className="text-danger focus:text-danger"
-              >
-                <Icon icon={Delete02Icon} size={16} className="mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <Icon icon={Cancel01Icon} size={14} />
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-[0.9375rem] leading-relaxed text-reading">
+            {comment.comment}
+          </p>
         )}
       </div>
-      {isEditing ? (
-        <div className="space-y-2">
-          <Input
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            placeholder="Edit your comment..."
-            autoFocus
-          />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={!editText.trim() || editText === comment.comment}
-              className="gap-1"
-            >
-              <Icon icon={Tick02Icon} size={14} />
-              Save
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setEditText(comment.comment);
-                setIsEditing(false);
-              }}
-              className="gap-1"
-            >
-              <Icon icon={Cancel01Icon} size={14} />
-              Cancel
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <p className="text-sm leading-relaxed text-foreground">
-          {comment.comment}
-        </p>
-      )}
     </div>
   );
 }

@@ -1,10 +1,60 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { codeToHtml } from "shiki";
 import { Icon } from "@/components/ui/icon";
 import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
+
+type Highlighter = Awaited<
+  ReturnType<typeof import("shiki/core").createHighlighterCore>
+>;
+
+let highlighterPromise: Promise<Highlighter> | null = null;
+
+// Shiki loads on demand so that it stays out of the route chunk. The
+// JavaScript regex engine replaces the 225 KB (gzip) Oniguruma WASM.
+function getHighlighter() {
+  highlighterPromise ??= Promise.all([
+    import("shiki/core"),
+    import("shiki/engine/javascript"),
+    import("shiki/themes"),
+  ]).then(
+    ([{ createHighlighterCore }, { createJavaScriptRegexEngine }, { bundledThemes }]) =>
+      createHighlighterCore({
+        engine: createJavaScriptRegexEngine({ forgiving: true }),
+        themes: [
+          bundledThemes["github-light"],
+          bundledThemes["github-dark-dimmed"],
+        ],
+        langs: [],
+      })
+  );
+  return highlighterPromise;
+}
+
+async function highlight(code: string, language: string) {
+  const [highlighter, { bundledLanguages }] = await Promise.all([
+    getHighlighter(),
+    import("shiki/langs"),
+  ]);
+  const loader =
+    language in bundledLanguages
+      ? bundledLanguages[language as keyof typeof bundledLanguages]
+      : undefined;
+  // Each grammar loads only when a post uses it. Unknown languages show as plain text.
+  if (loader && !highlighter.getLoadedLanguages().includes(language)) {
+    await highlighter.loadLanguage(loader);
+  }
+
+  return highlighter.codeToHtml(code, {
+    lang: loader ? language : "text",
+    themes: {
+      light: "github-light",
+      dark: "github-dark-dimmed",
+    },
+    defaultColor: false,
+  });
+}
 
 interface CodeBlockProps {
   code: string;
@@ -23,14 +73,7 @@ export function CodeBlock({
   useEffect(() => {
     let cancelled = false;
 
-    codeToHtml(code, {
-      lang: language || "text",
-      themes: {
-        light: "github-light",
-        dark: "github-dark-dimmed",
-      },
-      defaultColor: false,
-    })
+    highlight(code, language || "text")
       .then((result) => {
         if (!cancelled) setHtml(result);
       })
@@ -56,18 +99,18 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        "code-block group relative my-6 overflow-hidden rounded-md border border-border bg-paper",
+        "code-block group relative my-7 overflow-hidden rounded-[0.875rem] border border-border bg-paper",
         className
       )}
     >
-      <div className="flex items-center justify-between border-b border-border px-3 py-1.5">
-        <span className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-muted-foreground">
+      <div className="flex items-center justify-between border-b border-border py-2 pl-4 pr-2">
+        <span className="font-mono text-xs text-muted-foreground">
           {language || "text"}
         </span>
         <button
           type="button"
           onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="inline-flex h-7 items-center gap-1.5 rounded-full bg-muted px-3 font-sans text-xs text-foreground transition-colors hover:bg-border"
           aria-label={copied ? "Copied" : "Copy code"}
         >
           <Icon icon={copied ? Tick02Icon : Copy01Icon} size={14} />

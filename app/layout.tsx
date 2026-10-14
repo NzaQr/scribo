@@ -1,34 +1,28 @@
 import type React from "react";
 import type { Metadata } from "next";
-import {
-  Instrument_Serif,
-  DM_Sans,
-  DM_Mono,
-} from "next/font/google";
+import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-client";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/lib/auth-provider";
 import { Toaster } from "sonner";
 
-const instrumentSerif = Instrument_Serif({
+const newsreader = Newsreader({
   subsets: ["latin"],
-  weight: "400",
   style: ["normal", "italic"],
+  axes: ["opsz"],
   variable: "--font-display",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const geist = Geist({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   variable: "--font-ui",
   display: "swap",
 });
 
-const dmMono = DM_Mono({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
   variable: "--font-code",
   display: "swap",
 });
@@ -36,7 +30,7 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   title: "Scribo",
   description:
-    "A calm editorial room for sharing ideas on web development, design, and technology.",
+    "Long reads on code, design and the web, from the people who build it.",
 };
 
 export default function RootLayout({
@@ -47,13 +41,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${dmSans.variable} ${dmMono.variable}`}
+      className={`${newsreader.variable} ${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <body className="font-sans antialiased" suppressHydrationWarning>
         <a
           href="#main-content"
-          className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:inline-flex focus:h-10 focus:items-center focus:rounded-md focus:bg-paper-elevated focus:px-4 focus:text-sm focus:shadow-[var(--shadow-md)] focus:outline-none"
+          className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:inline-flex focus:h-10 focus:items-center focus:rounded-full focus:bg-paper-elevated focus:px-4 focus:text-sm focus:shadow-[var(--shadow-md)] focus:outline-none"
         >
           Skip to content
         </a>
