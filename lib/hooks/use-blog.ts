@@ -19,20 +19,21 @@ export const usePosts = () => {
 
 export const usePost = (id: string) => {
   const token = useAuthStore((state) => state.token);
-  const user = useAuthStore((state) => state.user);
 
   return useQuery({
     queryKey: queryKeys.post(id),
-    queryFn: () => blogApi.getPost(id, token || undefined, user?.id),
+    queryFn: () => blogApi.getPost(id, token || undefined),
     enabled: !!id,
     staleTime: STALE_TIME,
   });
 };
 
 export const useUserPosts = (userId: string) => {
+  const token = useAuthStore((state) => state.token);
+
   return useQuery({
     queryKey: queryKeys.userPosts(userId),
-    queryFn: () => blogApi.getUserPosts(userId),
+    queryFn: () => blogApi.getUserPosts(userId, token || undefined),
     enabled: !!userId,
     staleTime: STALE_TIME,
   });

@@ -10,11 +10,9 @@ export const blogApi = {
       .get<ApiResponse<BlogPost[]>>("/api/posts")
       .then((res) => res.data.data),
 
-  getPost: (id: string, token?: string, userId?: string) =>
+  getPost: (id: string, token?: string) =>
     getClient(!!token)
-      .get<ApiResponse<BlogPost>>(`/api/posts/${id}`, {
-        params: userId ? { userId } : {},
-      })
+      .get<ApiResponse<BlogPost>>(`/api/posts/${id}`)
       .then((res) => res.data.data),
 
   createPost: (post: CreatePostData) =>
@@ -32,8 +30,8 @@ export const blogApi = {
       .delete<ApiResponse<{ message: string }>>(`/api/posts/${id}`)
       .then((res) => res.data),
 
-  getUserPosts: (userId: string) =>
-    publicApi
+  getUserPosts: (userId: string, token?: string) =>
+    getClient(!!token)
       .get<ApiResponse<BlogPost[]>>(`/api/posts/user/${userId}`)
       .then((res) => res.data.data),
 

@@ -16,7 +16,7 @@ export const useLikePost = (
   useEffect(() => {
     setLikes(initialLikes);
     setIsLiked(userLiked);
-  }, [initialLikes]);
+  }, [initialLikes, userLiked]);
 
   const handleLike = async () => {
     if (!token) {

@@ -2,7 +2,9 @@
 
 import { useState, useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useRegister } from "./use-auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { getTooManyRequestsMessage, useRegister } from "./use-auth";
+import { queryKeys } from "./query-keys";
 import { useAuthStore } from "@/stores/auth-store";
 
 interface RegisterFormData {
@@ -23,6 +25,7 @@ interface RegisterFormErrors {
 export function useRegisterForm() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState<RegisterFormData>({
     username: "",
@@ -121,6 +124,8 @@ export function useRegisterForm() {
                 id: id,
                 username: username,
               });
+              // The cached Posts have userLiked of the anonymous Viewer.
+              queryClient.invalidateQueries({ queryKey: queryKeys.posts });
 
               router.push("/");
             },
@@ -129,6 +134,8 @@ export function useRegisterForm() {
                 setErrors({
                   email: "This email is already registered",
                 });
+              } else if (error?.response?.status === 429) {
+                setErrors({ general: getTooManyRequestsMessage(error) });
               } else if (error?.response?.status === 400) {
                 setErrors({
                   general: "Invalid data. Verify the information.",
@@ -146,7 +153,7 @@ export function useRegisterForm() {
         );
       });
     },
-    [formData, validateForm, registerMutation, router, login]
+    [formData, validateForm, registerMutation, router, login, queryClient]
   );
 
   const isLoading = isPending || isRegisterPending || isSubmitting;

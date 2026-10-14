@@ -2,7 +2,9 @@
 
 import { useState, useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useLogin } from "./use-auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { getTooManyRequestsMessage, useLogin } from "./use-auth";
+import { queryKeys } from "./query-keys";
 import { useAuthStore } from "@/stores/auth-store";
 
 interface FormData {
@@ -19,6 +21,7 @@ interface FormErrors {
 export function useLoginForm() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -89,13 +92,19 @@ export function useLoginForm() {
                 id: id,
                 username: username,
               });
+              // The cached Posts have userLiked of the anonymous Viewer.
+              queryClient.invalidateQueries({ queryKey: queryKeys.posts });
 
               router.push("/");
             },
-            onError: (error) => {
-              setErrors({
-                general: "Invalid credentials. Try again.",
-              });
+            onError: (error: any) => {
+              if (error?.response?.status === 429) {
+                setErrors({ general: getTooManyRequestsMessage(error) });
+              } else {
+                setErrors({
+                  general: "Invalid credentials. Try again.",
+                });
+              }
             },
             onSettled: () => {
               setIsSubmitting(false);
@@ -104,7 +113,7 @@ export function useLoginForm() {
         );
       });
     },
-    [formData, validateForm, loginMutation, router, login]
+    [formData, validateForm, loginMutation, router, login, queryClient]
   );
 
   const isLoading = isPending || isLoginPending || isSubmitting;
